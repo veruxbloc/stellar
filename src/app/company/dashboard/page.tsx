@@ -79,12 +79,12 @@ export default function CompanyDashboardPage() {
 
   return (
     <div className="min-h-screen bg-surface-container-low">
-      <main className="max-w-5xl mx-auto px-6 pt-28 pb-16 space-y-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-16 space-y-8">
         
         {/* Header / Welcome */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-on-background tracking-tight font-[family-name:var(--font-plus-jakarta)]">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-on-background tracking-tight font-[family-name:var(--font-plus-jakarta)]">
               Bienvenida{company ? `, ${company.name}` : ""}
             </h1>
             <p className="text-secondary text-sm mt-1">Gestioná tus ofertas laborales y encontrá talento certificado.</p>
@@ -92,8 +92,8 @@ export default function CompanyDashboardPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="glass-card bg-surface-container-lowest rounded-3xl p-6 shadow-ambient flex items-center gap-5 hover:translate-y-[-4px] transition-transform duration-300">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <div className="glass-card bg-surface-container-lowest rounded-3xl p-4 sm:p-6 shadow-ambient flex items-center gap-5 hover:translate-y-[-4px] transition-transform duration-300">
             <div className="brand-gradient rounded-2xl w-14 h-14 flex items-center justify-center shrink-0 shadow-lg text-white">
               <span className="material-symbols-outlined text-3xl">work</span>
             </div>
@@ -103,7 +103,7 @@ export default function CompanyDashboardPage() {
             </div>
           </div>
 
-          <div className="glass-card bg-surface-container-lowest rounded-3xl p-6 shadow-ambient flex items-center gap-5 hover:translate-y-[-4px] transition-transform duration-300">
+          <div className="glass-card bg-surface-container-lowest rounded-3xl p-4 sm:p-6 shadow-ambient flex items-center gap-5 hover:translate-y-[-4px] transition-transform duration-300">
             <div className="brand-gradient rounded-2xl w-14 h-14 flex items-center justify-center shrink-0 shadow-lg text-white">
               <span className="material-symbols-outlined text-3xl">school</span>
             </div>
@@ -114,10 +114,10 @@ export default function CompanyDashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Company info card */}
           {company && (
-            <div className="lg:col-span-1 bg-surface-container-lowest rounded-3xl shadow-ambient p-8 flex flex-col items-center text-center">
+            <div className="lg:col-span-1 bg-surface-container-lowest rounded-3xl shadow-ambient p-4 sm:p-8 flex flex-col items-center text-center">
               <div className="w-24 h-24 rounded-full bg-surface-container-high flex items-center justify-center text-4xl mb-4 font-[family-name:var(--font-plus-jakarta)] font-black text-primary border-4 border-white shadow-xl">
                 {company.name.charAt(0).toUpperCase()}
               </div>
@@ -132,10 +132,10 @@ export default function CompanyDashboardPage() {
           )}
 
           {/* Navigation Hub */}
-          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <Link
               href="/company/jobs"
-              className="bg-surface-container-lowest rounded-3xl shadow-ambient p-6 hover:translate-y-[-4px] transition-all group flex flex-col justify-between"
+              className="bg-surface-container-lowest rounded-3xl shadow-ambient p-4 sm:p-6 hover:translate-y-[-4px] transition-all group flex flex-col justify-between"
             >
               <div className="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
                 <span className="material-symbols-outlined">work_history</span>
@@ -148,7 +148,7 @@ export default function CompanyDashboardPage() {
 
             <Link
               href="/company/projects"
-              className="bg-surface-container-lowest rounded-3xl shadow-ambient p-6 hover:translate-y-[-4px] transition-all group flex flex-col justify-between"
+              className="bg-surface-container-lowest rounded-3xl shadow-ambient p-4 sm:p-6 hover:translate-y-[-4px] transition-all group flex flex-col justify-between"
             >
               <div className="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface mb-4 group-hover:bg-[#f6896c] group-hover:text-white transition-colors">
                 <span className="material-symbols-outlined">monetization_on</span>
@@ -161,7 +161,7 @@ export default function CompanyDashboardPage() {
 
             <Link
               href="/company/students"
-              className="bg-surface-container-lowest rounded-3xl shadow-ambient p-6 hover:translate-y-[-4px] transition-all group flex flex-col justify-between sm:col-span-2"
+              className="bg-surface-container-lowest rounded-3xl shadow-ambient p-4 sm:p-6 hover:translate-y-[-4px] transition-all group flex flex-col justify-between sm:col-span-2"
             >
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center text-on-surface group-hover:brand-gradient group-hover:text-white transition-colors shadow-sm group-hover:shadow-lg">

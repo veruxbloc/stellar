@@ -304,14 +304,14 @@ export default function CertificatesPage() {
 
   return (
     <div className="min-h-screen bg-surface-container-low">
-      <div className="max-w-7xl mx-auto px-6 pt-28 pb-16 space-y-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-16 space-y-12">
 
         {/* ═══════════════════════════════════════
             Header
             ═══════════════════════════════════════ */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-on-surface tracking-tight font-[family-name:var(--font-plus-jakarta)]">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-on-surface tracking-tight font-[family-name:var(--font-plus-jakarta)]">
               Carga de Certificados
             </h1>
             <p className="text-secondary text-sm mt-1">
@@ -332,7 +332,7 @@ export default function CertificatesPage() {
             ═══════════════════════════════════════ */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Upload area */}
-          <div className="bg-surface-container-lowest p-8 rounded-3xl shadow-ambient space-y-6">
+          <div className="bg-surface-container-lowest p-4 sm:p-8 rounded-3xl shadow-ambient space-y-6">
             <div className="space-y-1">
               <h2 className="text-xl font-bold font-[family-name:var(--font-plus-jakarta)]">Subir Certificado</h2>
               <p className="text-sm text-secondary">El PDF se almacena y se acuña como NFT automáticamente</p>
@@ -358,7 +358,7 @@ export default function CertificatesPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Drop zone */}
                 <div
-                  className="border-2 border-dashed border-outline-variant/40 bg-white/50 rounded-2xl p-10 flex flex-col items-center justify-center gap-4 group cursor-pointer hover:bg-white hover:border-primary transition-colors"
+                  className="border-2 border-dashed border-outline-variant/40 bg-white/50 rounded-2xl p-6 sm:p-10 flex flex-col items-center justify-center gap-4 group cursor-pointer hover:bg-white hover:border-primary transition-colors"
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
@@ -446,7 +446,7 @@ export default function CertificatesPage() {
             {certificates.filter(c => c.verified || c.nft_token_id).slice(0, 3).map((cert) => (
               <div
                 key={cert.id}
-                className="bg-surface-container-lowest p-6 rounded-2xl border-2 border-secondary-container/30 flex items-center gap-6 shadow-[0_10px_30px_rgba(231,199,240,0.2)]"
+                className="bg-surface-container-lowest p-4 sm:p-6 rounded-2xl border-2 border-secondary-container/30 flex items-center gap-6 shadow-[0_10px_30px_rgba(231,199,240,0.2)]"
               >
                 <div className="brand-gradient w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-md shrink-0">
                   <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>verified_user</span>
@@ -470,7 +470,7 @@ export default function CertificatesPage() {
 
             {/* Empty state */}
             {!uploading && certificates.filter(c => c.verified || c.nft_token_id).length === 0 && (
-              <div className="bg-surface-container-lowest/50 p-10 rounded-2xl flex flex-col items-center justify-center text-center">
+              <div className="bg-surface-container-lowest/50 p-6 sm:p-10 rounded-2xl flex flex-col items-center justify-center text-center">
                 <span className="material-symbols-outlined text-4xl text-outline-variant/30 mb-3">diamond</span>
                 <p className="text-sm text-secondary">Tus insignias verificadas aparecerán aquí</p>
               </div>
@@ -481,7 +481,7 @@ export default function CertificatesPage() {
         {/* ═══════════════════════════════════════
             Certificates List
             ═══════════════════════════════════════ */}
-        <section className="space-y-6">
+        <section className="space-y-4 sm:space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold font-[family-name:var(--font-plus-jakarta)]">
               Todos los Certificados
@@ -503,17 +503,17 @@ export default function CertificatesPage() {
               ))}
             </div>
           ) : certificates.length === 0 ? (
-            <div className="bg-surface-container-lowest rounded-3xl shadow-ambient p-10 text-center">
+            <div className="bg-surface-container-lowest rounded-3xl shadow-ambient p-6 sm:p-10 text-center">
               <span className="material-symbols-outlined text-5xl text-outline-variant/20 mb-3">school</span>
               <p className="text-secondary text-sm">Todavía no tenés certificados.</p>
               <p className="text-outline-variant text-xs mt-1">Subí tu primer PDF para acuñarlo como NFT.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {certificates.map((cert) => (
                 <div
                   key={cert.id}
-                  className="bg-surface-container-lowest p-6 rounded-3xl shadow-ambient hover:translate-y-[-4px] transition-transform duration-300 flex flex-col"
+                  className="bg-surface-container-lowest p-4 sm:p-6 rounded-3xl shadow-ambient hover:translate-y-[-4px] transition-transform duration-300 flex flex-col"
                 >
                   {/* Top row */}
                   <div className="flex justify-between items-start mb-4">

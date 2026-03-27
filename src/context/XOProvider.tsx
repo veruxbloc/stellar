@@ -58,7 +58,7 @@ export function XOProvider({ children }: { children: ReactNode }) {
       const { client } = await XOConnect.connect();
       if (client.alias) setClientAlias(client.alias);
       if (client.image) setClientImage(client.image);
-      const currency = client.currencies?.find((c) => c.address) as ({ id: string; address: string; chainId?: string } | undefined);
+      const currency = client.currencies?.find((c) => c.address) as { id: string; address: string; chainId?: string } | undefined;
       if (currency?.address) {
         setAddress(currency.address);
         if (currency.chainId) setChainId(currency.chainId);

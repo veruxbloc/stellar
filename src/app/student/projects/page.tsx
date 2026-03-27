@@ -35,6 +35,7 @@ export default function StudentProjectsPage() {
 
   const [openProjects, setOpenProjects] = useState<Project[]>([]);
   const [activeProjects, setActiveProjects] = useState<Project[]>([]);
+  const [completedProjects, setCompletedProjects] = useState<Project[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [studentId, setStudentId] = useState<string | null>(null);
   const [certificates, setCertificates] = useState<{ name?: string; institution?: string; year?: number; pdf_url?: string }[]>([]);
@@ -49,6 +50,8 @@ export default function StudentProjectsPage() {
   useEffect(() => {
     if (!loading && !user) router.push("/auth/login");
   }, [user, loading, router]);
+
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -75,13 +78,12 @@ export default function StudentProjectsPage() {
           .from("applications")
           .select("project_id, projects(id, title, description, amount_rbtc, deadline_days, tx_hash, contract_project_id, status, companies(name))")
           .eq("student_id", studentData.id)
-          .eq("status", "accepted");
+          .in("status", ["accepted", "pending"]);
 
         if (myAppsAccepted) {
-          const active = myAppsAccepted
-            .map((a) => a.projects as unknown as Project)
-            .filter((p) => p && (p.status === "active" || p.status === "delivered"));
-          setActiveProjects(active);
+          const allAssigned = myAppsAccepted.map((a) => a.projects as unknown as Project).filter(Boolean);
+          setActiveProjects(allAssigned.filter((p) => p.status === "active" || p.status === "delivered"));
+          setCompletedProjects(allAssigned.filter((p) => p.status === "completed"));
         }
       }
 
@@ -96,7 +98,7 @@ export default function StudentProjectsPage() {
     }
 
     fetchData();
-  }, [user, supabase]);
+  }, [user, supabase, refreshKey]);
 
   async function handleMatch(project: Project) {
     setMatchingId(project.id);
@@ -135,25 +137,7 @@ export default function StudentProjectsPage() {
     setDelivering(project.id);
     setDeliverError((prev) => ({ ...prev, [project.id]: "" }));
 
-    // Llamar al contrato si está disponible
-    if (isConnected && project.contract_project_id !== null) {
-      try {
-        const signer = await getSigner();
-        const contract = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, signer);
-        const tx = await contract.deliverWork(project.contract_project_id);
-        await tx.wait();
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Error";
-        if (!msg.includes("user rejected")) {
-          console.error("Error en contrato deliverWork:", err);
-          // Continuar igual — actualizamos DB
-        } else {
-          setDeliverError((prev) => ({ ...prev, [project.id]: "Transacción rechazada." }));
-          setDelivering(null);
-          return;
-        }
-      }
-    }
+    // deliverWork es llamado por la empresa al aprobar — el estudiante solo actualiza la DB
 
     // Actualizar estado en DB
     await supabase.from("projects").update({ status: "delivered" }).eq("id", project.id);
@@ -171,12 +155,12 @@ export default function StudentProjectsPage() {
 
   return (
     <div className="min-h-screen bg-surface-container-low">
-      <div className="max-w-7xl mx-auto px-6 pt-28 pb-16 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-16 space-y-8">
 
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-on-surface tracking-tight font-[family-name:var(--font-plus-jakarta)]">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-on-surface tracking-tight font-[family-name:var(--font-plus-jakarta)]">
               Tablero de Proyectos
             </h1>
             <p className="text-secondary text-sm mt-1">Encontrá proyectos con escrow en RSK y postulate</p>
@@ -206,13 +190,61 @@ export default function StudentProjectsPage() {
           </div>
         </div>
 
-        {/* Proyectos activos asignados */}
-        {activeProjects.length > 0 && (
+        {/* HISTORIAL TAB */}
+        {activeTab === "history" && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-bold text-secondary uppercase tracking-widest">Proyectos completados</h2>
+              <button
+                onClick={() => setRefreshKey(k => k + 1)}
+                className="flex items-center gap-1 text-xs text-primary font-bold uppercase tracking-widest hover:underline"
+              >
+                <span className="material-symbols-outlined text-sm">refresh</span>
+                Actualizar
+              </button>
+            </div>
+            {completedProjects.length === 0 ? (
+              <div className="bg-surface-container-lowest rounded-3xl p-10 text-center">
+                <span className="material-symbols-outlined text-5xl text-outline-variant/20 mb-3">history</span>
+                <p className="text-secondary">Todavía no completaste ningún proyecto.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {completedProjects.map((project) => (
+                  <div key={project.id} className="bg-surface-container-lowest p-4 sm:p-6 rounded-3xl shadow-ambient border border-green-200/40">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <h3 className="font-bold text-on-background">{project.title}</h3>
+                      <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#e2f5e8] text-[#1c7841]">
+                        Completado
+                      </span>
+                    </div>
+                    <p className="text-xs text-secondary">{project.companies?.name}</p>
+                    <p className="text-sm font-bold text-[#f8a287] mt-1">{project.amount_rbtc} tRBTC recibidos</p>
+                    {project.tx_hash && (
+                      <a href={`https://explorer.testnet.rsk.co/tx/${project.tx_hash}`} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-tertiary hover:underline mt-2 font-medium">
+                        <span className="material-symbols-outlined text-sm">open_in_new</span>
+                        Ver en RSK Explorer
+                      </a>
+                    )}
+                    <p className="mt-4 text-sm text-[#1c7841] font-medium flex items-center gap-1">
+                      <CheckCircle className="h-4 w-4" />
+                      Pago liberado por la empresa
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ACTIVE TAB — Proyectos activos asignados */}
+        {activeTab === "active" && activeProjects.length > 0 && (
           <div>
             <h2 className="text-sm font-bold text-secondary uppercase tracking-widest mb-4">Proyectos asignados</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {activeProjects.map((project) => (
-                <div key={project.id} className="bg-surface-container-lowest p-6 rounded-3xl shadow-ambient border border-blue-200/40">
+                <div key={project.id} className="bg-surface-container-lowest p-4 sm:p-6 rounded-3xl shadow-ambient border border-blue-200/40">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <h3 className="font-bold text-on-background">{project.title}</h3>
                     <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
@@ -261,7 +293,8 @@ export default function StudentProjectsPage() {
           </div>
         )}
 
-        {/* Proyectos abiertos */}
+        {/* Proyectos abiertos — solo en tab activos */}
+        {activeTab === "active" && (
         <div>
           <h2 className="text-sm font-bold text-secondary uppercase tracking-widest mb-4">Proyectos disponibles</h2>
           {openProjects.length === 0 ? (
@@ -270,7 +303,7 @@ export default function StudentProjectsPage() {
               <p className="text-secondary">No hay proyectos disponibles por ahora.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {openProjects.map((project) => {
                 const match = matches[project.id];
                 const isApplied = applied.has(project.id);
@@ -278,7 +311,7 @@ export default function StudentProjectsPage() {
                 return (
                   <div
                     key={project.id}
-                    className="bg-surface-container-lowest p-6 rounded-3xl shadow-ambient hover:translate-y-[-4px] transition-transform duration-300 flex flex-col"
+                    className="bg-surface-container-lowest p-4 sm:p-6 rounded-3xl shadow-ambient hover:translate-y-[-4px] transition-transform duration-300 flex flex-col"
                   >
                     {/* Top */}
                     <div className="flex justify-between items-start mb-4">
@@ -330,7 +363,7 @@ export default function StudentProjectsPage() {
                         <p className="text-xs text-secondary font-medium">{project.deadline_days} días</p>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         {!match && (
                           <button
                             onClick={() => handleMatch(project)}
@@ -366,6 +399,7 @@ export default function StudentProjectsPage() {
             </div>
           )}
         </div>
+        )}
       </div>
     </div>
   );

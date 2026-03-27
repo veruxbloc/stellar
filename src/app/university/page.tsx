@@ -70,22 +70,22 @@ export default function UniversityPage() {
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
         {/* KPIs */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             { label: "Total proyectos", value: totalProjects },
             { label: "Estudiantes activos", value: activeStudents },
             { label: "Proyectos completados", value: completedProjects },
           ].map((kpi) => (
-            <div key={kpi.label} className="bg-white rounded-2xl border border-slate-200 p-6 text-center">
-              <p className="text-3xl font-bold text-slate-900">{kpi.value}</p>
+            <div key={kpi.label} className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 text-center">
+              <p className="text-2xl sm:text-3xl font-bold text-slate-900">{kpi.value}</p>
               <p className="text-sm text-slate-500 mt-1">{kpi.label}</p>
             </div>
           ))}
         </div>
 
         {/* Skill gap */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="font-semibold text-slate-900 mb-6">Demanda de skills del mercado</h2>
+        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-slate-900 mb-6">Demanda de skills del mercado</h2>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={SKILL_GAP_DATA}>
               <XAxis dataKey="skill" tick={{ fontSize: 12 }} />
@@ -97,8 +97,8 @@ export default function UniversityPage() {
         </div>
 
         {/* Retención */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="font-semibold text-slate-900 mb-6">Retención de estudiantes (%)</h2>
+        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-slate-900 mb-6">Retención de estudiantes (%)</h2>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={RETENTION_DATA}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />

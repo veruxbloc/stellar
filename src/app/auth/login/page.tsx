@@ -4,12 +4,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+
+const DEMO_ACCOUNTS = [
+  { label: "🎓 Estudiante demo", email: "estudiante@mail.com", password: "123456" },
+  { label: "🏢 Empresa demo", email: "empresaverux@mail.com", password: "123456" },
+];
+
 export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [demoOpen, setDemoOpen] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -38,7 +45,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 pt-20">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 pt-24">
       <div className="w-full max-w-md">
 
         <div className="mb-10">
@@ -48,7 +55,7 @@ export default function LoginPage() {
               Acceso
             </span>
           </div>
-          <h1 className="font-[family-name:var(--font-plus-jakarta)] font-extrabold text-4xl uppercase tracking-tighter text-on-surface mb-2">
+          <h1 className="font-[family-name:var(--font-plus-jakarta)] font-extrabold text-2xl sm:text-4xl uppercase tracking-tighter text-on-surface mb-2">
             Iniciar sesión
           </h1>
           <p className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-sm">
@@ -56,7 +63,37 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-surface-container border border-outline-variant/20 p-8 space-y-6">
+        {/* Demo accounts dropdown */}
+        <div className="mb-6 relative">
+          <button
+            type="button"
+            onClick={() => setDemoOpen(o => !o)}
+            className="w-full flex items-center justify-between px-4 py-3 border border-dashed border-primary/40 text-primary text-xs font-bold uppercase tracking-widest hover:bg-primary/5 transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">bolt</span>
+              Acceso rápido — cuentas demo
+            </span>
+            <span className="material-symbols-outlined text-sm">{demoOpen ? "expand_less" : "expand_more"}</span>
+          </button>
+          {demoOpen && (
+            <div className="absolute z-10 w-full mt-1 bg-surface-container border border-outline-variant/20 shadow-lg">
+              {DEMO_ACCOUNTS.map((acc) => (
+                <button
+                  key={acc.email}
+                  type="button"
+                  onClick={() => { setEmail(acc.email); setPassword(acc.password); setDemoOpen(false); }}
+                  className="w-full flex flex-col items-start px-4 py-3 hover:bg-surface-container-high transition-colors border-b border-outline-variant/10 last:border-0"
+                >
+                  <span className="text-sm font-bold text-on-surface">{acc.label}</span>
+                  <span className="text-xs text-on-surface-variant mt-0.5">{acc.email}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <form onSubmit={handleSubmit} className="bg-surface-container border border-outline-variant/20 p-5 sm:p-8 space-y-6">
           <div>
             <label className="block font-[family-name:var(--font-plus-jakarta)] text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
               Email

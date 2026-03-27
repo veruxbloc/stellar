@@ -142,7 +142,7 @@ export default function StudentDashboardPage() {
   return (
     <div className="min-h-screen bg-surface-container-low">
       {showWalletModal && <WalletModal onClose={() => setShowWalletModal(false)} />}
-      <div className="max-w-7xl mx-auto px-6 pt-28 pb-16 space-y-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-16 space-y-12">
 
         {/* ═══════════════════════════════════════
             Verified Profile Section
@@ -150,11 +150,11 @@ export default function StudentDashboardPage() {
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
           {/* Profile Card */}
-          <div className="lg:col-span-4 bg-surface-container-lowest p-8 rounded-3xl shadow-ambient">
+          <div className="lg:col-span-4 bg-surface-container-lowest p-4 sm:p-8 rounded-3xl shadow-ambient">
             <div className="flex flex-col items-center text-center space-y-4">
               {/* Avatar with verified badge */}
               <div className="relative">
-                <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-xl rotate-3 bg-surface-container-high">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl overflow-hidden shadow-xl rotate-3 bg-surface-container-high">
                   {/* Initials avatar */}
                   <div className="w-full h-full flex items-center justify-center brand-gradient text-white text-4xl font-extrabold tracking-tight">
                     {profileLoading
@@ -179,7 +179,7 @@ export default function StudentDashboardPage() {
                   </div>
                 ) : profile ? (
                   <>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-on-background font-[family-name:var(--font-plus-jakarta)]">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-on-background font-[family-name:var(--font-plus-jakarta)]">
                       {profile.name}
                     </h1>
                     <p className="text-primary font-semibold text-sm">{profile.career}</p>
@@ -264,7 +264,7 @@ export default function StudentDashboardPage() {
         {/* ═══════════════════════════════════════
             Wallet Connection
             ═══════════════════════════════════════ */}
-        <section className="bg-surface-container-lowest p-8 rounded-3xl shadow-ambient">
+        <section className="bg-surface-container-lowest p-4 sm:p-8 rounded-3xl shadow-ambient">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-2xl bg-secondary-container flex items-center justify-center">
               <span className="material-symbols-outlined text-on-secondary-container text-2xl">account_balance_wallet</span>
@@ -326,7 +326,7 @@ export default function StudentDashboardPage() {
             ═══════════════════════════════════════ */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Total certs */}
-          <div className="glass-card p-8 rounded-3xl shadow-ambient relative overflow-hidden">
+          <div className="glass-card p-4 sm:p-8 rounded-3xl shadow-ambient relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-10">
               <span className="material-symbols-outlined text-9xl">school</span>
             </div>
@@ -349,7 +349,7 @@ export default function StudentDashboardPage() {
           </div>
 
           {/* Verified */}
-          <div className="glass-card p-8 rounded-3xl shadow-ambient relative overflow-hidden">
+          <div className="glass-card p-4 sm:p-8 rounded-3xl shadow-ambient relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-10">
               <span className="material-symbols-outlined text-9xl">verified</span>
             </div>
@@ -374,7 +374,7 @@ export default function StudentDashboardPage() {
           </div>
 
           {/* Wallet status */}
-          <div className="glass-card p-8 rounded-3xl shadow-ambient relative overflow-hidden">
+          <div className="glass-card p-4 sm:p-8 rounded-3xl shadow-ambient relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-10">
               <span className="material-symbols-outlined text-9xl">account_balance_wallet</span>
             </div>
@@ -402,11 +402,11 @@ export default function StudentDashboardPage() {
         {/* ═══════════════════════════════════════
             Quick Actions – Navigation Cards
             ═══════════════════════════════════════ */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Certificates */}
           <Link
             href="/student/certificates"
-            className="group bg-surface-container-lowest p-8 rounded-3xl shadow-ambient hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+            className="group bg-surface-container-lowest p-4 sm:p-8 rounded-3xl shadow-ambient hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center gap-4 mb-4">
@@ -430,7 +430,7 @@ export default function StudentDashboardPage() {
           {/* Projects */}
           <Link
             href="/student/projects"
-            className="group bg-surface-container-lowest p-8 rounded-3xl shadow-ambient hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+            className="group bg-surface-container-lowest p-4 sm:p-8 rounded-3xl shadow-ambient hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center gap-4 mb-4">
@@ -520,7 +520,7 @@ export default function StudentDashboardPage() {
                 <div className="flex justify-between items-center text-left">
                   <div>
                     <p className="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Emisor</p>
-                    <p className="text-sm font-semibold text-on-background line-clamp-1">{selectedNft.institution || "TalentChain"}</p>
+                    <p className="text-sm font-semibold text-on-background line-clamp-1">{selectedNft.institution || "Verux"}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] text-secondary font-bold uppercase tracking-widest mb-1">Año</p>

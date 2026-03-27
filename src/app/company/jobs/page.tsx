@@ -256,19 +256,19 @@ export default function CompanyJobsPage() {
   return (
     <div className="min-h-screen bg-surface-container-low">
 
-      <main className="max-w-4xl mx-auto px-6 pt-24 pb-16 space-y-12">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16 space-y-12">
         {/* Navigation back and Title */}
         <div className="flex items-center gap-4">
           <Link href="/company/dashboard" className="w-12 h-12 rounded-full glass-premium flex items-center justify-center text-on-surface hover:scale-105 transition-transform shadow-ambient">
             <span className="material-symbols-outlined">arrow_back</span>
           </Link>
-          <h1 className="text-3xl font-extrabold text-on-background font-[family-name:var(--font-plus-jakarta)] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-on-background font-[family-name:var(--font-plus-jakarta)] tracking-tight">
             Ofertas & Proyectos
           </h1>
         </div>
 
         {/* --- Job Offers Section --- */}
-        <section className="bg-surface-container-lowest rounded-[2.5rem] shadow-ambient p-8">
+        <section className="bg-surface-container-lowest rounded-[2.5rem] shadow-ambient p-5 sm:p-8">
           <div className="flex justify-between items-center mb-8 border-b border-outline-variant/20 pb-4">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-3xl text-primary">work</span>
@@ -334,7 +334,7 @@ export default function CompanyJobsPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {jobs.map((job) => (
-                <div key={job.id} className="bg-surface-container rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-start gap-4 border border-outline-variant/10 hover:border-primary/30 transition-colors group">
+                <div key={job.id} className="bg-surface-container rounded-2xl p-5 flex flex-col sm:flex-row flex-wrap justify-between items-start gap-4 border border-outline-variant/10 hover:border-primary/30 transition-colors group">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-bold text-on-background">{job.title}</h3>
@@ -365,7 +365,7 @@ export default function CompanyJobsPage() {
 
 
         {/* --- Escrow Projects Section --- */}
-        <section className="bg-surface-container-lowest rounded-[2.5rem] shadow-ambient p-8 relative overflow-hidden glass-card">
+        <section className="bg-surface-container-lowest rounded-[2.5rem] shadow-ambient p-5 sm:p-8 relative overflow-hidden glass-card">
           {/* Fondo decorativo cripto */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#f8a287]/10 rounded-full blur-3xl" />
 

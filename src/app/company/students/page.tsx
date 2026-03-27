@@ -137,7 +137,7 @@ export default function CompanyStudentsPage() {
   return (
     <div className="min-h-screen bg-surface-container-low">
 
-      <main className="max-w-5xl mx-auto px-6 pt-24 pb-16 space-y-12">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-16 space-y-12">
         {/* Navigation back and Title */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-outline-variant/10 pb-8">
           <div className="flex items-center gap-4">
@@ -145,7 +145,7 @@ export default function CompanyStudentsPage() {
               <span className="material-symbols-outlined">arrow_back</span>
             </Link>
             <div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-on-background font-[family-name:var(--font-plus-jakarta)] tracking-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-on-background font-[family-name:var(--font-plus-jakarta)] tracking-tight">
                 Talento Verificado
               </h1>
               <p className="text-secondary text-sm mt-1 uppercase font-bold tracking-widest hidden sm:block">
@@ -155,7 +155,7 @@ export default function CompanyStudentsPage() {
           </div>
         </div>
 
-        <section className="bg-surface-container-lowest rounded-[2.5rem] shadow-ambient p-8 glass-card border flex flex-col items-start gap-4 mb-10 overflow-hidden relative">
+        <section className="bg-surface-container-lowest rounded-[2.5rem] shadow-ambient p-5 sm:p-8 glass-card border flex flex-col items-start gap-4 mb-10 overflow-hidden relative">
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#E2C6F8]/20 rounded-full blur-3xl" />
           
           <div className="flex items-center gap-3 relative z-10 w-full mb-2">
@@ -213,11 +213,11 @@ export default function CompanyStudentsPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filtered.map((student) => (
               <div
                 key={student.id}
-                className="group relative bg-surface-container-lowest rounded-3xl p-6 shadow-ambient hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 border border-transparent hover:border-outline-variant/20 flex flex-col justify-between"
+                className="group relative bg-surface-container-lowest rounded-3xl p-4 sm:p-6 shadow-ambient hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 border border-transparent hover:border-outline-variant/20 flex flex-col justify-between"
               >
                 {/* Holographic accent glow on hover */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-[#E2C6F8]/0 to-[#F8A081]/0 group-hover:from-[#E2C6F8]/5 group-hover:to-[#F8A081]/10 rounded-3xl pointer-events-none transition-colors" />

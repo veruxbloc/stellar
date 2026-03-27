@@ -62,7 +62,7 @@ export default function RegisterPage() {
               Registro
             </span>
           </div>
-          <h1 className="font-[family-name:var(--font-plus-jakarta)] font-extrabold text-4xl uppercase tracking-tighter text-on-surface mb-2">
+          <h1 className="font-[family-name:var(--font-plus-jakarta)] font-extrabold text-2xl sm:text-4xl uppercase tracking-tighter text-on-surface mb-2">
             Crear cuenta
           </h1>
           <p className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-sm">
@@ -102,7 +102,7 @@ export default function RegisterPage() {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-surface-container border border-outline-variant/20 p-8 space-y-5">
+        <form onSubmit={handleSubmit} className="bg-surface-container border border-outline-variant/20 p-5 sm:p-8 space-y-4 sm:space-y-5">
           <div>
             <label className="block font-[family-name:var(--font-plus-jakarta)] text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
               {role === "student" ? "Nombre completo" : "Nombre de la empresa"}
