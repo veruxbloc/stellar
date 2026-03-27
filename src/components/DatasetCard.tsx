@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 import { Dataset } from '@/data/mockDatasets';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/Card';
-import { Button } from './ui/Button';
 import { PurchaseModal } from './PurchaseModal';
-import { Database, TrendingUp } from 'lucide-react';
 
 export function DatasetCard({ dataset }: { dataset: Dataset }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,69 +10,61 @@ export function DatasetCard({ dataset }: { dataset: Dataset }) {
 
   return (
     <>
-      <Card className="flex flex-col h-full hover:shadow-xl transition-all duration-300 hover:border-blue-200">
-        <CardHeader>
-          <div className="mb-3 flex items-start justify-between">
-            <div className="rounded-xl bg-blue-50 p-3 shadow-sm border border-blue-100/50">
-              <Database className="h-6 w-6 text-blue-600" />
-            </div>
-            <div className="flex flex-wrap gap-1.5 justify-end w-2/3">
-              {dataset.tags.slice(0, 2).map(tag => (
-                <span key={tag} className="px-2.5 py-1 bg-slate-100/80 text-slate-600 text-xs rounded-lg font-medium whitespace-nowrap">
-                  {tag}
-                </span>
-              ))}
-            </div>
+      <div className="flex flex-col md:flex-row items-center gap-6 p-6 bg-surface-container-high hover:bg-surface-container-highest transition-all group">
+        {/* Icon */}
+        <div className="relative w-20 h-20 shrink-0 flex items-center justify-center bg-surface-container border border-outline-variant/30">
+          <svg className="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 2.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125m16.5 2.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+          </svg>
+          <div className="absolute -bottom-1 -right-1 bg-primary text-on-primary p-1 border-2 border-surface-container-high">
+            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+              <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clipRule="evenodd" />
+            </svg>
           </div>
-          <CardTitle className="text-xl leading-tight mb-2 mt-2">{dataset.name}</CardTitle>
-          <CardDescription className="line-clamp-3 text-sm leading-relaxed">{dataset.description}</CardDescription>
-        </CardHeader>
-        
-        <CardContent className="flex-grow flex flex-col justify-end">
-          <div className="mb-5 mt-auto">
-            <div className="flex justify-between text-sm mb-2 font-medium">
-              <span className="text-slate-600">Progreso</span>
-              <span className="text-blue-600 font-bold">{progress}%</span>
-            </div>
-            <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
-              <div 
-                className="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
-                style={{ width: `${Math.min(progress, 100)}%` }}
-              >
-                <div className="absolute inset-0 bg-white/20 w-full animate-pulse"></div>
-              </div>
-            </div>
-            <div className="flex justify-between text-xs mt-2 text-slate-500 font-medium">
-              <span>${dataset.fundedAmount.toLocaleString()}</span>
-              <span>Objetivo: ${dataset.fundingGoal.toLocaleString()}</span>
-            </div>
+        </div>
+
+        {/* Info */}
+        <div className="flex-grow">
+          <h5 className="font-[family-name:var(--font-plus-jakarta)] font-bold text-lg uppercase tracking-tight mb-1 text-on-surface">
+            {dataset.name}
+          </h5>
+          <p className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-xs uppercase tracking-widest font-semibold">
+            {dataset.tags.join(' · ')}
+          </p>
+        </div>
+
+        {/* Progress */}
+        <div className="w-full md:w-48">
+          <div className="flex justify-between mb-2">
+            <span className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">CAPITALIZACIÓN</span>
+            <span className="text-[10px] text-primary font-bold">{progress}%</span>
           </div>
-
-          <div className="grid grid-cols-2 gap-4 rounded-xl bg-slate-50 p-4 border border-slate-100">
-            <div>
-              <p className="text-xs text-slate-500 font-medium mb-1">Precio por token</p>
-              <p className="font-bold text-slate-900 text-lg">${dataset.tokenPrice}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 font-medium mb-1">Disponibles</p>
-              <p className="font-bold text-slate-900 text-lg">{dataset.tokensAvailable} <span className="text-sm font-normal text-slate-400">/ {dataset.totalTokens}</span></p>
-            </div>
+          <div className="h-1 bg-surface-variant w-full">
+            <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${Math.min(progress, 100)}%` }} />
           </div>
-        </CardContent>
+        </div>
 
-        <CardFooter className="pt-2">
-          <Button 
-            className="w-full gap-2 text-base h-12 shadow-md hover:shadow-lg transition-all" 
-            onClick={() => setIsModalOpen(true)}
-            disabled={dataset.tokensAvailable === 0}
-          >
-            <TrendingUp className="h-4 w-4" />
-            {dataset.tokensAvailable === 0 ? 'Sin tokens disponibles' : 'Comprar tokens'}
-          </Button>
-        </CardFooter>
-      </Card>
+        {/* Price */}
+        <div className="text-right min-w-[140px]">
+          <div className="text-primary font-[family-name:var(--font-plus-jakarta)] font-bold text-lg">
+            ${dataset.tokenPrice} <span className="text-xs text-on-surface-variant">/ token</span>
+          </div>
+          <div className="text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">
+            {dataset.tokensAvailable} disponibles
+          </div>
+        </div>
 
-      <PurchaseModal 
+        {/* Action */}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          disabled={dataset.tokensAvailable === 0}
+          className="bg-primary text-on-primary px-6 py-3 font-[family-name:var(--font-plus-jakarta)] font-extrabold text-[10px] tracking-widest uppercase hover:bg-primary-fixed-dim transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none w-full md:w-auto"
+        >
+          {dataset.tokensAvailable === 0 ? 'AGOTADO' : 'BUY TOKENS'}
+        </button>
+      </div>
+
+      <PurchaseModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         datasetId={dataset.id}

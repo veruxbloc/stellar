@@ -2,89 +2,92 @@
 
 import { useMarketplace } from '@/context/MarketplaceContext';
 import { DatasetCard } from '@/components/DatasetCard';
-import { Button } from '@/components/ui/Button';
-import { ArrowRight, Database, Coins, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
   const { datasets } = useMarketplace();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen pt-20">
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-white pt-20 pb-28 lg:pt-32 lg:pb-36">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-        <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-blue-500 opacity-20 blur-[100px]"></div>
-        
-        <div className="container mx-auto px-4 sm:px-8 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-sm font-medium mb-8 shadow-sm">
-            <span className="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
-            Etiqueta destacada
+      <section className="relative overflow-hidden bg-surface pt-20 pb-28 lg:pt-32 lg:pb-36 border-b border-outline-variant/15">
+        {/* Background watermark */}
+        <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 opacity-5 pointer-events-none select-none text-[40vw] font-black text-primary leading-none font-[family-name:var(--font-plus-jakarta)]">
+          TC
+        </div>
+
+        <div className="container mx-auto px-4 sm:px-8 relative z-10">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="h-[1px] w-12 bg-primary" />
+            <span className="font-[family-name:var(--font-plus-jakarta)] font-bold uppercase tracking-[0.3em] text-primary text-sm">
+              Etiqueta destacada
+            </span>
           </div>
 
-          <h1 className="text-5xl lg:text-7xl font-extrabold text-slate-900 tracking-tight mb-6 max-w-4xl mx-auto">
+          <h1 className="font-[family-name:var(--font-plus-jakarta)] font-extrabold text-5xl lg:text-7xl leading-[0.9] tracking-tighter mb-10 max-w-4xl text-on-surface">
             Título principal de la
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 drop-shadow-sm"> plataforma</span>
+            <span className="text-primary italic"> plataforma</span>
           </h1>
 
-          <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="font-[family-name:var(--font-manrope)] text-xl text-on-surface-variant mb-12 max-w-2xl leading-relaxed">
             Descripción breve de la propuesta de valor. Explicá qué hace la plataforma y para quién está pensada en dos o tres oraciones.
           </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="h-14 px-8 text-lg rounded-full shadow-lg shadow-blue-500/20" onClick={() => document.getElementById('marketplace')?.scrollIntoView({ behavior: 'smooth' })}>
-              Acción principal <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Link href="/dashboard" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full w-full sm:w-auto bg-white border-slate-200">
+
+          <div className="flex flex-col sm:flex-row gap-6">
+            <button
+              onClick={() => document.getElementById('marketplace')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-primary text-on-primary px-10 py-5 font-[family-name:var(--font-plus-jakarta)] font-extrabold tracking-widest uppercase text-sm hover:bg-primary-fixed-dim transition-all active:scale-95"
+            >
+              Acción principal
+            </button>
+            <Link href="/dashboard">
+              <button className="border border-outline-variant/30 text-primary px-10 py-5 font-[family-name:var(--font-plus-jakarta)] font-extrabold tracking-widest uppercase text-sm hover:bg-surface-container-high transition-all w-full sm:w-auto">
                 Mi Panel
-              </Button>
+              </button>
             </Link>
           </div>
-          
-          <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-3xl mx-auto border-t border-slate-100 pt-10">
-            <div className="flex flex-col items-center p-4">
-              <div className="bg-blue-50 p-3 rounded-2xl mb-4">
-                <Database className="h-8 w-8 text-blue-500" />
-              </div>
-              <h3 className="font-bold text-slate-900 text-lg">Característica 1</h3>
-              <p className="text-slate-500 text-sm mt-1">Descripción breve de la primera ventaja o diferencial.</p>
+
+          {/* Feature pills */}
+          <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-0 max-w-3xl border-t border-outline-variant/15 pt-10">
+            <div className="p-6 hover:bg-surface-container-high transition-colors">
+              <h3 className="font-[family-name:var(--font-plus-jakarta)] font-bold text-on-surface text-lg uppercase tracking-tight mb-2">Característica 1</h3>
+              <p className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-sm">Descripción breve de la primera ventaja o diferencial.</p>
             </div>
-            <div className="flex flex-col items-center p-4">
-              <div className="bg-indigo-50 p-3 rounded-2xl mb-4">
-                <Coins className="h-8 w-8 text-indigo-500" />
-              </div>
-              <h3 className="font-bold text-slate-900 text-lg">Característica 2</h3>
-              <p className="text-slate-500 text-sm mt-1">Descripción breve de la segunda ventaja o diferencial.</p>
+            <div className="p-6 hover:bg-surface-container-high transition-colors border-t sm:border-t-0 sm:border-x border-outline-variant/15">
+              <h3 className="font-[family-name:var(--font-plus-jakarta)] font-bold text-on-surface text-lg uppercase tracking-tight mb-2">Característica 2</h3>
+              <p className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-sm">Descripción breve de la segunda ventaja o diferencial.</p>
             </div>
-            <div className="flex flex-col items-center p-4">
-              <div className="bg-green-50 p-3 rounded-2xl mb-4">
-                <ShieldCheck className="h-8 w-8 text-green-500" />
-              </div>
-              <h3 className="font-bold text-slate-900 text-lg">Característica 3</h3>
-              <p className="text-slate-500 text-sm mt-1">Descripción breve de la tercera ventaja o diferencial.</p>
+            <div className="p-6 hover:bg-surface-container-high transition-colors border-t sm:border-t-0">
+              <h3 className="font-[family-name:var(--font-plus-jakarta)] font-bold text-on-surface text-lg uppercase tracking-tight mb-2">Característica 3</h3>
+              <p className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-sm">Descripción breve de la tercera ventaja o diferencial.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Marketplace Section */}
-      <section id="marketplace" className="py-24 bg-slate-50">
+      <section id="marketplace" className="py-24 bg-surface-container-low">
         <div className="container mx-auto px-4 sm:px-8">
-          <div className="mb-12 text-center sm:text-left sm:flex sm:items-end sm:justify-between">
+          <div className="mb-16 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
             <div className="max-w-2xl">
-              <h2 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl mb-4">Título de sección</h2>
-              <p className="text-lg text-slate-600">Descripción de esta sección. Explicá brevemente qué puede encontrar el usuario aquí.</p>
+              <h2 className="font-[family-name:var(--font-plus-jakarta)] font-bold text-4xl sm:text-5xl uppercase tracking-tighter text-on-surface mb-4">
+                Título de sección
+              </h2>
+              <p className="font-[family-name:var(--font-manrope)] text-lg text-on-surface-variant">
+                Descripción de esta sección. Explicá brevemente qué puede encontrar el usuario aquí.
+              </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="space-y-4">
             {datasets.map((dataset) => (
               <DatasetCard key={dataset.id} dataset={dataset} />
             ))}
           </div>
         </div>
       </section>
+
     </div>
   );
 }

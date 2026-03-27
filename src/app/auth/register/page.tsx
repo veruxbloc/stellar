@@ -4,9 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/Button";
-import { Building2, GraduationCap } from "lucide-react";
-
 type Role = "student" | "company";
 
 export default function RegisterPage() {
@@ -28,7 +25,6 @@ export default function RegisterPage() {
     setLoading(true);
     setError("");
 
-    // Crear usuario via API server-side (sin rate limit de Auth)
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -43,7 +39,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // Iniciar sesión automáticamente después del registro
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
     if (signInError) {
@@ -57,11 +52,22 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 pt-20 pb-10">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Crear cuenta</h1>
-          <p className="text-slate-500 mt-2">Elegí tu rol para comenzar</p>
+
+        <div className="mb-10">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="h-[1px] w-8 bg-primary" />
+            <span className="font-[family-name:var(--font-plus-jakarta)] font-bold uppercase tracking-[0.3em] text-primary text-xs">
+              Registro
+            </span>
+          </div>
+          <h1 className="font-[family-name:var(--font-plus-jakarta)] font-extrabold text-4xl uppercase tracking-tighter text-on-surface mb-2">
+            Crear cuenta
+          </h1>
+          <p className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-sm">
+            Elegí tu rol para comenzar.
+          </p>
         </div>
 
         {/* Selector de rol */}
@@ -69,32 +75,36 @@ export default function RegisterPage() {
           <button
             type="button"
             onClick={() => setRole("student")}
-            className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+            className={`flex flex-col items-center gap-2 p-5 border-2 transition-all font-[family-name:var(--font-plus-jakarta)] font-bold uppercase text-xs tracking-widest ${
               role === "student"
-                ? "border-blue-600 bg-blue-50 text-blue-700"
-                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-outline-variant/30 bg-surface-container text-on-surface-variant hover:border-outline-variant"
             }`}
           >
-            <GraduationCap className="h-7 w-7" />
-            <span className="text-sm font-semibold">Estudiante</span>
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 3.741-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+            </svg>
+            Estudiante
           </button>
           <button
             type="button"
             onClick={() => setRole("company")}
-            className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+            className={`flex flex-col items-center gap-2 p-5 border-2 transition-all font-[family-name:var(--font-plus-jakarta)] font-bold uppercase text-xs tracking-widest ${
               role === "company"
-                ? "border-blue-600 bg-blue-50 text-blue-700"
-                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-outline-variant/30 bg-surface-container text-on-surface-variant hover:border-outline-variant"
             }`}
           >
-            <Building2 className="h-7 w-7" />
-            <span className="text-sm font-semibold">Empresa</span>
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+            </svg>
+            Empresa
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-surface-container border border-outline-variant/20 p-8 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block font-[family-name:var(--font-plus-jakarta)] text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
               {role === "student" ? "Nombre completo" : "Nombre de la empresa"}
             </label>
             <input
@@ -102,32 +112,36 @@ export default function RegisterPage() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
               placeholder={role === "student" ? "Juan Pérez" : "Acme Corp"}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <label className="block font-[family-name:var(--font-plus-jakarta)] text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+              Email
+            </label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
               placeholder="tu@email.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
+            <label className="block font-[family-name:var(--font-plus-jakarta)] text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+              Contraseña
+            </label>
             <input
               type="password"
               required
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
               placeholder="Mínimo 6 caracteres"
             />
           </div>
@@ -135,22 +149,26 @@ export default function RegisterPage() {
           {role === "student" && (
             <>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Universidad</label>
+                <label className="block font-[family-name:var(--font-plus-jakarta)] text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+                  Universidad
+                </label>
                 <input
                   type="text"
                   value={university}
                   onChange={(e) => setUniversity(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
                   placeholder="UBA, UTN, UADE..."
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Carrera</label>
+                <label className="block font-[family-name:var(--font-plus-jakarta)] text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+                  Carrera
+                </label>
                 <input
                   type="text"
                   value={career}
                   onChange={(e) => setCareer(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
                   placeholder="Ingeniería en Sistemas..."
                 />
               </div>
@@ -159,32 +177,41 @@ export default function RegisterPage() {
 
           {role === "company" && (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Industria</label>
+              <label className="block font-[family-name:var(--font-plus-jakarta)] text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+                Industria
+              </label>
               <input
                 type="text"
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
                 placeholder="Tecnología, Finanzas..."
               />
             </div>
           )}
 
           {error && (
-            <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-xl">{error}</p>
+            <p className="text-sm text-error bg-error-container/20 border border-error/20 px-4 py-3">
+              {error}
+            </p>
           )}
 
-          <Button type="submit" isLoading={loading} className="w-full" size="lg">
-            Crear cuenta
-          </Button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary text-on-primary py-4 font-[family-name:var(--font-plus-jakarta)] font-extrabold tracking-widest uppercase text-sm hover:bg-primary-fixed-dim transition-all active:scale-95 disabled:opacity-70 disabled:pointer-events-none"
+          >
+            {loading ? "CREANDO CUENTA..." : "CREAR CUENTA"}
+          </button>
 
-          <p className="text-center text-sm text-slate-500">
+          <p className="text-center font-[family-name:var(--font-manrope)] text-sm text-on-surface-variant">
             ¿Ya tenés cuenta?{" "}
-            <Link href="/auth/login" className="text-blue-600 font-medium hover:underline">
+            <Link href="/auth/login" className="text-primary font-semibold hover:text-primary-fixed-dim transition-colors">
               Iniciar sesión
             </Link>
           </p>
         </form>
+
       </div>
     </div>
   );

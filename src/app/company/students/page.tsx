@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/Button";
-import { ArrowLeft, GraduationCap, Search, ExternalLink, Award, X } from "lucide-react";
 
 interface CertifiedStudent {
   id: string;
@@ -41,7 +39,6 @@ export default function CompanyStudentsPage() {
     async function fetchCertifiedStudents() {
       setDataLoading(true);
 
-      // Fetch all certificates joined with student info
       const { data: certsData } = await supabase
         .from("certificates")
         .select(
@@ -55,7 +52,6 @@ export default function CompanyStudentsPage() {
         return;
       }
 
-      // Group certificates by student_id
       const studentMap = new Map<
         string,
         {
@@ -79,7 +75,6 @@ export default function CompanyStudentsPage() {
         const existing = studentMap.get(cert.student_id);
         if (existing) {
           existing.count += 1;
-          // Already sorted by created_at desc, first occurrence = latest
         } else {
           studentMap.set(cert.student_id, {
             studentData: studentInfo,
@@ -107,8 +102,7 @@ export default function CompanyStudentsPage() {
     }
 
     fetchCertifiedStudents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, supabase]);
 
   const filtered = students.filter((s) => {
     const uniQuery = universityFilter.trim().toLowerCase();
@@ -130,14 +124,8 @@ export default function CompanyStudentsPage() {
 
   if (loading || dataLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <svg className="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-          </svg>
-          <p className="text-slate-500 text-sm">Cargando estudiantes...</p>
-        </div>
+      <div className="min-h-screen bg-surface-container-low flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -147,148 +135,158 @@ export default function CompanyStudentsPage() {
   const hasActiveFilters = universityFilter.trim() !== "" || careerFilter.trim() !== "";
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3">
-          <Link href="/company/dashboard" className="text-slate-400 hover:text-slate-600 transition-colors">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <div className="flex items-center gap-2">
-            <GraduationCap className="h-5 w-5 text-emerald-600" />
-            <span className="font-bold text-slate-900">Estudiantes certificados</span>
+    <div className="min-h-screen bg-surface-container-low">
+
+      <main className="max-w-5xl mx-auto px-6 pt-24 pb-16 space-y-12">
+        {/* Navigation back and Title */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-outline-variant/10 pb-8">
+          <div className="flex items-center gap-4">
+            <Link href="/company/dashboard" className="w-12 h-12 rounded-full glass-premium flex items-center justify-center text-on-surface hover:scale-105 transition-transform shadow-ambient shrink-0">
+              <span className="material-symbols-outlined">arrow_back</span>
+            </Link>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-extrabold text-on-background font-[family-name:var(--font-plus-jakarta)] tracking-tight">
+                Talento Verificado
+              </h1>
+              <p className="text-secondary text-sm mt-1 uppercase font-bold tracking-widest hidden sm:block">
+                Explora perfiles respaldados por blockchain
+              </p>
+            </div>
           </div>
         </div>
-      </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        {/* Filters */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Search className="h-4 w-4 text-slate-400" />
-            <h2 className="text-sm font-semibold text-slate-700">Filtrar estudiantes</h2>
+        <section className="bg-surface-container-lowest rounded-[2.5rem] shadow-ambient p-8 glass-card border flex flex-col items-start gap-4 mb-10 overflow-hidden relative">
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#E2C6F8]/20 rounded-full blur-3xl" />
+          
+          <div className="flex items-center gap-3 relative z-10 w-full mb-2">
+            <span className="material-symbols-outlined text-primary text-2xl">person_search</span>
+            <h2 className="text-lg font-bold text-on-background">Motor de Búsqueda de Talentos</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Universidad</label>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full relative z-10">
+            <div className="relative group">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary group-focus-within:text-primary transition-colors">school</span>
               <input
-                type="text"
-                value={universityFilter}
-                onChange={(e) => setUniversityFilter(e.target.value)}
-                placeholder="Ej: UTN, UBA..."
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                type="text" value={universityFilter} onChange={(e) => setUniversityFilter(e.target.value)}
+                placeholder="Filtrar por Universidad (ej: UTN, UBA)"
+                className="w-full bg-surface-container rounded-2xl pl-12 pr-4 py-4 text-on-background text-sm font-bold border-2 border-transparent focus:border-primary/20 focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-inner"
               />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">Carrera</label>
+            
+            <div className="relative group">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary group-focus-within:text-primary transition-colors">history_edu</span>
               <input
-                type="text"
-                value={careerFilter}
-                onChange={(e) => setCareerFilter(e.target.value)}
-                placeholder="Ej: Sistemas, Contador..."
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                type="text" value={careerFilter} onChange={(e) => setCareerFilter(e.target.value)}
+                placeholder="Filtrar por Carrera (ej: Sistemas)"
+                className="w-full bg-surface-container rounded-2xl pl-12 pr-4 py-4 text-on-background text-sm font-bold border-2 border-transparent focus:border-primary/20 focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-inner"
               />
             </div>
           </div>
+          
           {hasActiveFilters && (
-            <div className="mt-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="gap-1.5 text-slate-500"
-              >
-                <X className="h-3.5 w-3.5" />
-                Limpiar filtros
-              </Button>
-            </div>
+            <button
+              onClick={clearFilters}
+              className="mt-2 text-[10px] font-black uppercase tracking-widest text-[#a44222] bg-[#fdebe4] px-4 py-2 rounded-full hover:scale-105 active:scale-95 transition-transform flex items-center gap-2 relative z-10"
+            >
+              <span className="material-symbols-outlined text-[14px]">close</span>
+              Limpiar Búsqueda
+            </button>
           )}
+        </section>
+
+        {/* Results grid */}
+        <div className="mb-4">
+          <p className="text-[10px] font-black uppercase tracking-widest text-secondary flex items-center gap-2">
+            <span className="material-symbols-outlined text-sm">filter_list</span>
+            {filtered.length} Perfiles Encontrados
+          </p>
         </div>
 
-        {/* Results count */}
-        <p className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
-          {filtered.length === 0
-            ? "Sin resultados"
-            : `${filtered.length} estudiante${filtered.length !== 1 ? "s" : ""} encontrado${filtered.length !== 1 ? "s" : ""}`}
-        </p>
-
-        {/* Student list */}
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-            <GraduationCap className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-            {students.length === 0 ? (
-              <>
-                <p className="text-slate-500 font-medium">No hay estudiantes certificados aún.</p>
-                <p className="text-slate-400 text-sm mt-1">
-                  Los estudiantes aparecerán aquí cuando reciban su primer certificado NFT.
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-slate-500 font-medium">No se encontraron resultados.</p>
-                <p className="text-slate-400 text-sm mt-1">
-                  Probá con otros filtros o{" "}
-                  <button
-                    onClick={clearFilters}
-                    className="text-blue-600 hover:underline font-medium"
-                  >
-                    limpiá los filtros
-                  </button>
-                  .
-                </p>
-              </>
-            )}
+          <div className="bg-surface-container-lowest rounded-[2.5rem] p-16 text-center border border-outline-variant/10 shadow-ambient glass-card">
+            <span className="material-symbols-outlined text-6xl text-surface-container-highest mb-4">search_off</span>
+            <p className="text-xl font-bold text-on-background mb-2">Sin coincidencias</p>
+            <p className="text-secondary text-sm">
+              {students.length === 0 
+                ? "Ningún estudiante ha acuñado certificados hasta ahora."
+                : "No encontramos talento con esos criterios. Intenta borrar los filtros."}
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((student) => (
               <div
                 key={student.id}
-                className="bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:border-blue-200 transition-all"
+                className="group relative bg-surface-container-lowest rounded-3xl p-6 shadow-ambient hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 border border-transparent hover:border-outline-variant/20 flex flex-col justify-between"
               >
-                {/* Avatar + name */}
-                <div className="flex items-start gap-3 mb-4">
-                  <div className="bg-gradient-to-br from-blue-500 to-emerald-500 rounded-full h-10 w-10 flex items-center justify-center shrink-0">
-                    <span className="text-white font-bold text-sm">
+                {/* Holographic accent glow on hover */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-[#E2C6F8]/0 to-[#F8A081]/0 group-hover:from-[#E2C6F8]/5 group-hover:to-[#F8A081]/10 rounded-3xl pointer-events-none transition-colors" />
+
+                <div>
+                  <div className="flex items-center gap-4 mb-6 relative">
+                    <div className="brand-gradient w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-lg">
                       {student.name.charAt(0).toUpperCase()}
-                    </span>
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-lg text-on-background line-clamp-1">{student.name}</h3>
+                      <p className="text-[10px] uppercase font-black tracking-widest text-[#f8a287] border border-[#f8a287]/20 bg-[#f8a287]/10 px-2 py-0.5 rounded-lg mt-1 inline-flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: '"FILL" 1' }}>verified</span>
+                        Talento Validado
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <h3 className="font-semibold text-slate-900 truncate">{student.name}</h3>
-                    <p className="text-sm text-slate-500 truncate">{student.career}</p>
+
+                  <div className="space-y-4 relative">
+                    <div className="flex gap-3 items-start">
+                      <span className="material-symbols-outlined text-secondary text-lg mt-0.5 opacity-50">school</span>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-secondary">Universidad</p>
+                        <p className="text-sm font-bold text-on-background leading-tight">{student.university}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3 items-start">
+                      <span className="material-symbols-outlined text-secondary text-lg mt-0.5 opacity-50">history_edu</span>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-secondary">Carrera</p>
+                        <p className="text-sm font-bold text-on-background">{student.career}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 items-start">
+                      <span className="material-symbols-outlined text-primary text-lg mt-0.5">workspace_premium</span>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Credenciales</p>
+                        <p className="text-lg font-black text-on-background">
+                          {student.certificateCount} <span className="text-[10px] uppercase text-secondary">NFTs</span>
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Details */}
-                <div className="space-y-1.5 mb-4">
-                  <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                    <span className="text-slate-400 text-xs">Universidad:</span>
-                    <span className="truncate">{student.university}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Award className="h-4 w-4 text-amber-500 shrink-0" />
-                    <span className="text-sm font-medium text-slate-700">
-                      {student.certificateCount} certificado{student.certificateCount !== 1 ? "s" : ""} NFT
-                    </span>
-                  </div>
+                {/* Etherscan Link Bottom Area */}
+                <div className="mt-8 pt-4 border-t border-outline-variant/10 relative z-10 flex justify-between items-center">
+                  <span className="text-[8px] font-black tracking-widest uppercase text-secondary">Prueba Blockchain</span>
+                  {student.latestTxHash ? (
+                    <a
+                      href={getEtherscanUrl(student.latestTxHash)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group/btn flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#1c7841] hover:bg-[#e2f5e8] bg-surface hover:border-[#1c7841] border border-transparent transition-all px-3 py-1.5 rounded-full"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                      Etherscan
+                    </a>
+                  ) : (
+                    <span className="text-[10px] font-bold text-secondary italic">Privado</span>
+                  )}
                 </div>
-
-                {/* Etherscan link */}
-                {student.latestTxHash && (
-                  <a
-                    href={getEtherscanUrl(student.latestTxHash)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-medium hover:underline"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    Ver en Etherscan
-                  </a>
-                )}
               </div>
             ))}
           </div>
         )}
+
       </main>
     </div>
   );

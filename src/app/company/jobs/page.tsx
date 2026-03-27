@@ -12,7 +12,7 @@ import { createClient } from "@/lib/supabase/client";
 const xoProvider = new XOConnectProvider({ debug: false });
 import { Button } from "@/components/ui/Button";
 import { ESCROW_ADDRESS, ESCROW_ABI, RSK_TESTNET_CHAIN_ID } from "@/lib/escrow";
-import { ArrowLeft, Briefcase, Plus, Trash2, X, Coins, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 interface JobPost {
   id: string;
@@ -21,16 +21,6 @@ interface JobPost {
   type: "job" | "internship";
   created_at: string;
 }
-
-const TYPE_LABELS: Record<string, string> = {
-  job: "Empleo",
-  internship: "Pasantía",
-};
-
-const TYPE_BADGE_STYLES: Record<string, string> = {
-  job: "bg-blue-100 text-blue-700",
-  internship: "bg-violet-100 text-violet-700",
-};
 
 export default function CompanyJobsPage() {
   const router = useRouter();
@@ -202,7 +192,6 @@ export default function CompanyJobsPage() {
       );
 
       const receipt = await tx.wait();
-
       const iface = new ethers.Interface(ESCROW_ABI);
       let contractProjectId: number | null = null;
       for (const log of receipt.logs) {
@@ -256,14 +245,8 @@ export default function CompanyJobsPage() {
 
   if (loading || dataLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <svg className="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-          </svg>
-          <p className="text-slate-500 text-sm">Cargando ofertas...</p>
-        </div>
+      <div className="min-h-screen bg-surface-container-low flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -271,238 +254,216 @@ export default function CompanyJobsPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/company/dashboard" className="text-slate-400 hover:text-slate-600 transition-colors">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-            <div className="flex items-center gap-2">
-              <Briefcase className="h-5 w-5 text-blue-600" />
-              <span className="font-bold text-slate-900">Ofertas laborales</span>
-            </div>
-          </div>
-          <Button size="sm" onClick={() => setShowForm((v) => !v)} className="gap-1.5">
-            {showForm ? (
-              <>
-                <X className="h-4 w-4" />
-                Cancelar
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4" />
-                Nueva oferta
-              </>
-            )}
-          </Button>
+    <div className="min-h-screen bg-surface-container-low">
+
+      <main className="max-w-4xl mx-auto px-6 pt-24 pb-16 space-y-12">
+        {/* Navigation back and Title */}
+        <div className="flex items-center gap-4">
+          <Link href="/company/dashboard" className="w-12 h-12 rounded-full glass-premium flex items-center justify-center text-on-surface hover:scale-105 transition-transform shadow-ambient">
+            <span className="material-symbols-outlined">arrow_back</span>
+          </Link>
+          <h1 className="text-3xl font-extrabold text-on-background font-[family-name:var(--font-plus-jakarta)] tracking-tight">
+            Ofertas & Proyectos
+          </h1>
         </div>
-      </header>
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        {/* New job form */}
-        {showForm && (
-          <div className="bg-white rounded-2xl border border-blue-200 shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-5">Publicar nueva oferta</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Título del puesto <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Ej: Desarrollador Frontend Jr."
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Descripción <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  required
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describí las responsabilidades, requisitos y beneficios del puesto..."
-                  rows={4}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Tipo de oferta <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value as "job" | "internship")}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="job">Empleo</option>
-                  <option value="internship">Pasantía</option>
-                </select>
-              </div>
-
-              {formError && (
-                <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-xl">{formError}</p>
-              )}
-
-              <div className="flex gap-3 pt-1">
-                <Button type="submit" isLoading={submitting} size="md">
-                  Publicar oferta
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="md"
-                  onClick={() => {
-                    setShowForm(false);
-                    setFormError("");
-                  }}
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </form>
+        {/* --- Job Offers Section --- */}
+        <section className="bg-surface-container-lowest rounded-[2.5rem] shadow-ambient p-8">
+          <div className="flex justify-between items-center mb-8 border-b border-outline-variant/20 pb-4">
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-3xl text-primary">work</span>
+              <h2 className="text-2xl font-bold text-on-background">Bolsa de Empleo</h2>
+            </div>
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="brand-gradient text-white px-5 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-md hover:brightness-110 transition-all flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-sm">{showForm ? "close" : "add"}</span>
+              {showForm ? "Cancelar" : "Publicar Empleo"}
+            </button>
           </div>
-        )}
 
-        {/* Job list */}
-        <div>
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
-            {jobs.length === 0
-              ? "Sin ofertas publicadas"
-              : `${jobs.length} oferta${jobs.length !== 1 ? "s" : ""} publicada${jobs.length !== 1 ? "s" : ""}`}
-          </h2>
+          {showForm && (
+            <div className="bg-surface-container rounded-3xl p-6 mb-8 border border-outline-variant/10 shadow-inner">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Posición</label>
+                    <input
+                      type="text" required value={title} onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Ej: Ingeniero Solidity Ssr"
+                      className="w-full bg-surface-container-lowest rounded-2xl px-4 py-3 text-on-background focus:ring-2 focus:ring-primary outline-none transition-shadow"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Descripción del rol</label>
+                    <textarea
+                      required value={description} onChange={(e) => setDescription(e.target.value)} rows={4}
+                      placeholder="Responsabilidades y requisitos..."
+                      className="w-full bg-surface-container-lowest rounded-2xl px-4 py-3 text-on-background focus:ring-2 focus:ring-primary outline-none transition-shadow resize-none"
+                    />
+                  </div>
+                  <div className="md:col-span-1">
+                    <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Modalidad</label>
+                    <select
+                      value={type} onChange={(e) => setType(e.target.value as "job" | "internship")}
+                      className="w-full bg-surface-container-lowest rounded-2xl px-4 py-3 text-on-background focus:ring-2 focus:ring-primary outline-none transition-shadow appearance-none"
+                    >
+                      <option value="job">Tiempo Completo</option>
+                      <option value="internship">Pasantía / Trainee</option>
+                    </select>
+                  </div>
+                </div>
+
+                {formError && <p className="text-xs font-bold bg-error/10 text-error p-3 rounded-xl">{formError}</p>}
+                
+                <div className="pt-4 text-right">
+                  <Button type="submit" isLoading={submitting} className="brand-gradient text-white rounded-full px-8 py-3 text-xs tracking-widest uppercase">
+                    Lanzar Oferta
+                  </Button>
+                </div>
+              </form>
+            </div>
+          )}
 
           {jobs.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
-              <Briefcase className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-500 font-medium">Todavía no publicaste ninguna oferta.</p>
-              <p className="text-slate-400 text-sm mt-1">
-                Hacé clic en{" "}
-                <span className="font-medium text-blue-600">Nueva oferta</span> para empezar.
-              </p>
+            <div className="text-center py-10 opacity-60">
+              <span className="material-symbols-outlined text-6xl mb-4">work_off</span>
+              <p className="text-sm font-bold tracking-widest uppercase">Sin ofertas activas</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4">
               {jobs.map((job) => (
-                <div
-                  key={job.id}
-                  className="bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-sm transition-shadow"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-slate-900 truncate">{job.title}</h3>
-                        <span
-                          className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                            TYPE_BADGE_STYLES[job.type] ?? "bg-slate-100 text-slate-600"
-                          }`}
-                        >
-                          {TYPE_LABELS[job.type] ?? job.type}
-                        </span>
-                      </div>
-                      <p className="text-slate-500 text-sm mt-1.5 line-clamp-2">{job.description}</p>
-                      <p className="text-xs text-slate-400 mt-2">{formatDate(job.created_at)}</p>
+                <div key={job.id} className="bg-surface-container rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-start gap-4 border border-outline-variant/10 hover:border-primary/30 transition-colors group">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-lg font-bold text-on-background">{job.title}</h3>
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                        job.type === "internship" ? "bg-secondary-container text-on-secondary-container" : "bg-primary/10 text-primary"
+                      }`}>
+                        {job.type}
+                      </span>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(job.id)}
-                      isLoading={deletingId === job.id}
-                      className="text-red-400 hover:text-red-600 hover:bg-red-50 shrink-0"
-                      aria-label="Eliminar oferta"
-                    >
-                      {deletingId !== job.id && <Trash2 className="h-4 w-4" />}
-                    </Button>
+                    <p className="text-sm text-secondary line-clamp-2">{job.description}</p>
+                    <div className="mt-4 flex items-center gap-2 text-[10px] text-secondary/60 font-bold uppercase tracking-widest">
+                      <span className="material-symbols-outlined text-sm">calendar_today</span>
+                      {formatDate(job.created_at)}
+                    </div>
                   </div>
+                  <button
+                    onClick={() => handleDelete(job.id)}
+                    disabled={deletingId === job.id}
+                    className="w-10 h-10 rounded-full bg-surface-container-highest text-error flex items-center justify-center hover:scale-110 active:scale-95 transition-transform"
+                  >
+                    <span className="material-symbols-outlined">{deletingId === job.id ? "hourglass_empty" : "delete"}</span>
+                  </button>
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </section>
 
-        {/* Escrow Projects Section */}
-        <div className="mt-10">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Coins className="h-5 w-5 text-orange-500" />
-              Proyectos con Escrow RSK
-            </h2>
-            <Button size="sm" onClick={() => setShowEscrowForm((v) => !v)} className="gap-1.5 bg-orange-500 hover:bg-orange-600">
-              {showEscrowForm ? <><X className="h-4 w-4" />Cancelar</> : <><Plus className="h-4 w-4" />Nuevo proyecto</>}
-            </Button>
+
+        {/* --- Escrow Projects Section --- */}
+        <section className="bg-surface-container-lowest rounded-[2.5rem] shadow-ambient p-8 relative overflow-hidden glass-card">
+          {/* Fondo decorativo cripto */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#f8a287]/10 rounded-full blur-3xl" />
+
+          <div className="flex justify-between items-center mb-8 border-b border-outline-variant/20 pb-4 relative z-10">
+            <div className="flex items-center gap-3">
+              <div className="bg-[#f8a287]/20 p-2 rounded-xl text-[#f8a287] flex">
+                <span className="material-symbols-outlined text-3xl">currency_bitcoin</span>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-on-background">Proyectos Escrow</h2>
+                <p className="text-xs text-secondary tracking-widest font-bold uppercase">Contratos Inteligentes en RSK</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowEscrowForm(!showEscrowForm)}
+              className="bg-[#f8a287] text-white px-5 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-md hover:brightness-110 transition-all flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-sm">{showEscrowForm ? "close" : "add"}</span>
+              {showEscrowForm ? "Cancelar" : "Crear Pago"}
+            </button>
           </div>
 
           {showEscrowForm && (
-            <div className="bg-white rounded-2xl border border-orange-200 shadow-sm p-6 mb-6">
-              <h3 className="text-lg font-semibold text-slate-900 mb-1">Crear proyecto con escrow</h3>
-              <p className="text-sm text-slate-500 mb-5">El monto quedará bloqueado en RSK hasta que apruebes la entrega.</p>
+            <div className="glass-premium rounded-3xl p-6 mb-8 border border-white/20 relative z-10">
               <form onSubmit={handleCreateEscrow} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Título <span className="text-red-500">*</span></label>
-                  <input type="text" required value={escrowTitle} onChange={(e) => setEscrowTitle(e.target.value)}
-                    placeholder="Ej: App móvil de delivery"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Descripción <span className="text-red-500">*</span></label>
-                  <textarea required value={escrowDescription} onChange={(e) => setEscrowDescription(e.target.value)}
-                    rows={3} placeholder="Describí el proyecto y los requisitos..."
-                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Nombre del Proyecto</label>
+                    <input type="text" required value={escrowTitle} onChange={(e) => setEscrowTitle(e.target.value)} placeholder="App descentralizada XYZ"
+                      className="w-full bg-surface-container-lowest/50 rounded-2xl px-4 py-3 text-on-background focus:ring-2 focus:ring-[#f8a287] outline-none" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Entregable Requerido</label>
+                    <textarea required value={escrowDescription} onChange={(e) => setEscrowDescription(e.target.value)} rows={3}
+                      className="w-full bg-surface-container-lowest/50 rounded-2xl px-4 py-3 text-on-background focus:ring-2 focus:ring-[#f8a287] outline-none resize-none" />
+                  </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Monto (tRBTC) <span className="text-red-500">*</span></label>
+                    <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Presupuesto (tRBTC)</label>
                     <input type="number" step="0.0001" min="0.0001" required value={escrowAmount} onChange={(e) => setEscrowAmount(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                      className="w-full bg-surface-container-lowest/50 rounded-2xl px-4 py-3 text-on-background focus:ring-2 focus:ring-[#f8a287] outline-none font-mono" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Deadline (días) <span className="text-red-500">*</span></label>
+                    <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Plazo (Días)</label>
                     <input type="number" min="1" required value={escrowDays} onChange={(e) => setEscrowDays(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                      className="w-full bg-surface-container-lowest/50 rounded-2xl px-4 py-3 text-on-background focus:ring-2 focus:ring-[#f8a287] outline-none" />
                   </div>
                 </div>
-                {escrowError && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-xl">{escrowError}</p>}
-                <Button type="submit" isLoading={escrowSubmitting} className="bg-orange-500 hover:bg-orange-600">
-                  Fondear proyecto en RSK
-                </Button>
+                {escrowError && <p className="text-xs font-bold bg-error/10 text-error p-3 rounded-xl">{escrowError}</p>}
+                <div className="pt-4 text-right">
+                  <Button type="submit" isLoading={escrowSubmitting} className="bg-[#f8a287] text-white rounded-full px-8 py-3 text-xs tracking-widest uppercase hover:bg-[#e89075]">
+                    Bloquear Fondos en Smart Contract
+                  </Button>
+                </div>
               </form>
             </div>
           )}
 
           {escrowProjects.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
-              <Coins className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-500">Todavía no creaste proyectos con escrow.</p>
+            <div className="text-center py-10 opacity-60 relative z-10">
+              <span className="material-symbols-outlined text-6xl mb-4">account_balance_wallet</span>
+              <p className="text-sm font-bold tracking-widest uppercase">Sin Contratos Abiertos</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 relative z-10">
               {escrowProjects.map((p) => (
-                <div key={p.id} className="bg-white rounded-2xl border border-slate-200 p-5">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h3 className="font-semibold text-slate-900">{p.title}</h3>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">{p.status}</span>
+                <div key={p.id} className="bg-surface-container rounded-2xl p-5 flex flex-col lg:flex-row justify-between gap-4 border border-outline-variant/10">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-lg font-bold text-on-background">{p.title}</h3>
+                      <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-secondary-container text-on-secondary-container">
+                        {p.status}
+                      </span>
+                    </div>
+                    <p className="text-sm text-secondary line-clamp-2">{p.description}</p>
+                    {p.tx_hash && (
+                      <a href={`https://explorer.testnet.rsk.co/tx/${p.tx_hash}`} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[10px] font-mono text-[#f8a287] hover:underline mt-4 bg-[#f8a287]/10 px-3 py-1.5 rounded-lg border border-[#f8a287]/20">
+                        <span className="material-symbols-outlined text-[10px]">link</span>
+                        {p.tx_hash.substring(0,20)}...
+                      </a>
+                    )}
                   </div>
-                  <p className="text-slate-500 text-sm line-clamp-2">{p.description}</p>
-                  <p className="text-sm font-medium text-orange-600 mt-2">{p.amount_rbtc} tRBTC · {p.deadline_days} días</p>
-                  {p.tx_hash && (
-                    <a href={`https://explorer.testnet.rsk.co/tx/${p.tx_hash}`} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1">
-                      <ExternalLink className="h-3 w-3" />Ver en RSK Explorer
-                    </a>
-                  )}
+                  <div className="flex items-center gap-6 lg:border-l lg:border-outline-variant/20 lg:pl-6">
+                    <div className="text-center">
+                      <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">Monto</p>
+                      <p className="text-xl font-black text-on-background font-mono">{p.amount_rbtc} <span className="text-xs">tRBTC</span></p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">Plazo</p>
+                      <p className="text-xl font-black text-on-background">{p.deadline_days} <span className="text-xs">días</span></p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </section>
+
       </main>
     </div>
   );

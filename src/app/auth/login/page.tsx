@@ -4,16 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/Button";
-import { Building2, GraduationCap } from "lucide-react";
-
-type Role = "student" | "company";
-
 export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const [role, setRole] = useState<Role>("student");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -32,100 +26,87 @@ export default function LoginPage() {
       return;
     }
 
-    // Verificar que el rol coincida
+    // Obtener rol del usuario desde la DB
     const { data: userData } = await supabase
       .from("users")
       .select("role")
       .eq("id", data.user.id)
       .single();
 
-    if (userData?.role !== role) {
-      setError(`Esta cuenta está registrada como ${userData?.role === "student" ? "estudiante" : "empresa"}`);
-      await supabase.auth.signOut();
-      setLoading(false);
-      return;
-    }
-
-    router.push(role === "student" ? "/student/dashboard" : "/company/dashboard");
+    router.push(userData?.role === "company" ? "/company/dashboard" : "/student/dashboard");
     router.refresh();
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 pt-20">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Iniciar sesión</h1>
-          <p className="text-slate-500 mt-2">Seleccioná tu rol</p>
+
+        <div className="mb-10">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="h-[1px] w-8 bg-primary" />
+            <span className="font-[family-name:var(--font-plus-jakarta)] font-bold uppercase tracking-[0.3em] text-primary text-xs">
+              Acceso
+            </span>
+          </div>
+          <h1 className="font-[family-name:var(--font-plus-jakarta)] font-extrabold text-4xl uppercase tracking-tighter text-on-surface mb-2">
+            Iniciar sesión
+          </h1>
+          <p className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-sm">
+            Ingresá con tu cuenta para continuar.
+          </p>
         </div>
 
-        {/* Selector de rol */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <button
-            type="button"
-            onClick={() => setRole("student")}
-            className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
-              role === "student"
-                ? "border-blue-600 bg-blue-50 text-blue-700"
-                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
-            }`}
-          >
-            <GraduationCap className="h-7 w-7" />
-            <span className="text-sm font-semibold">Estudiante</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setRole("company")}
-            className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
-              role === "company"
-                ? "border-blue-600 bg-blue-50 text-blue-700"
-                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
-            }`}
-          >
-            <Building2 className="h-7 w-7" />
-            <span className="text-sm font-semibold">Empresa</span>
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-surface-container border border-outline-variant/20 p-8 space-y-6">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <label className="block font-[family-name:var(--font-plus-jakarta)] text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+              Email
+            </label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
               placeholder="tu@email.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
+            <label className="block font-[family-name:var(--font-plus-jakarta)] text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+              Contraseña
+            </label>
             <input
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"
               placeholder="Tu contraseña"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-xl">{error}</p>
+            <p className="text-sm text-error bg-error-container/20 border border-error/20 px-4 py-3">
+              {error}
+            </p>
           )}
 
-          <Button type="submit" isLoading={loading} className="w-full" size="lg">
-            Ingresar
-          </Button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary text-on-primary py-4 font-[family-name:var(--font-plus-jakarta)] font-extrabold tracking-widest uppercase text-sm hover:bg-primary-fixed-dim transition-all active:scale-95 disabled:opacity-70 disabled:pointer-events-none"
+          >
+            {loading ? "INGRESANDO..." : "INGRESAR"}
+          </button>
 
-          <p className="text-center text-sm text-slate-500">
+          <p className="text-center font-[family-name:var(--font-manrope)] text-sm text-on-surface-variant">
             ¿No tenés cuenta?{" "}
-            <Link href="/auth/register" className="text-blue-600 font-medium hover:underline">
+            <Link href="/auth/register" className="text-primary font-semibold hover:text-primary-fixed-dim transition-colors">
               Registrarse
             </Link>
           </p>
         </form>
+
       </div>
     </div>
   );

@@ -1,92 +1,149 @@
 "use client";
 
-import { Wallet, X, Smartphone, Monitor } from "lucide-react";
 import { useXO } from "@/context/XOProvider";
 
-export function WalletModal({ onClose }: { onClose: () => void }) {
-  const { isBeexo, connect, connectMetaMask } = useXO();
-  const siteUrl = typeof window !== "undefined" ? window.location.origin : "vendimia-tech.vercel.app";
+interface WalletModalProps {
+  isOpen?: boolean;
+  onClose: () => void;
+}
+
+export function WalletModal({ isOpen, onClose }: WalletModalProps) {
+  const { connectBeexo, connectMetaMask } = useXO();
+
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(
+    typeof navigator !== "undefined" ? navigator.userAgent : ""
+  );
+
+  if (isOpen === false) return null;
 
   async function handleBeexo() {
-    if (isBeexo) {
-      await connect();
-      onClose();
-    }
+    onClose();
+    await connectBeexo();
   }
 
   async function handleMetaMask() {
-    await connectMetaMask();
     onClose();
+    await connectMetaMask();
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      <div
-        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
-          <X className="h-5 w-5" />
-        </button>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-blue-100 rounded-xl">
-            <Wallet className="h-5 w-5 text-blue-600" />
-          </div>
+      <div className="relative z-10 w-full max-w-sm mx-4 bg-surface-container border border-outline-variant/30">
+        {/* Header */}
+        <div className="flex items-center justify-between px-8 py-6 border-b border-outline-variant/20">
           <div>
-            <h2 className="font-bold text-slate-900">Conectar Wallet</h2>
-            <p className="text-xs text-slate-500">Elegí cómo conectarte</p>
+            <p className="font-[family-name:var(--font-plus-jakarta)] font-bold uppercase tracking-[0.2em] text-primary text-xs mb-1">
+              Web3
+            </p>
+            <h2 className="font-[family-name:var(--font-plus-jakarta)] font-extrabold text-xl uppercase tracking-tight text-on-surface">
+              Conectar Wallet
+            </h2>
           </div>
+          <button onClick={onClose} className="text-on-surface-variant hover:text-primary transition-colors text-xl font-bold">
+            ✕
+          </button>
         </div>
 
-        <div className="space-y-3">
-          {/* Beexo */}
-          <button
-            onClick={handleBeexo}
-            className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-all text-left"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center shrink-0">
-              <Smartphone className="h-5 w-5 text-white" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold text-slate-900 text-sm">Beexo Wallet</p>
-              <p className="text-xs text-slate-500">
-                {isBeexo ? "✓ Detectado — click para conectar" : "Abrí esta URL en el browser de Beexo"}
-              </p>
-            </div>
-            {isBeexo && (
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Activo</span>
-            )}
-          </button>
+        {/* Opción recomendada según dispositivo */}
+        <div className="px-6 pt-6 pb-3">
+          <p className="font-[family-name:var(--font-plus-jakarta)] text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3">
+            Recomendado para {isMobile ? "móvil" : "escritorio"}
+          </p>
 
-          {!isBeexo && (
-            <div className="bg-slate-50 rounded-xl p-3 border border-slate-200">
-              <p className="text-xs text-slate-600 font-medium mb-1">¿Cómo conectar con Beexo?</p>
-              <ol className="text-xs text-slate-500 space-y-1 list-decimal list-inside">
-                <li>Abrí la app <strong>Beexo</strong> en tu celular</li>
-                <li>Tocá el ícono de <strong>browser/explorar</strong></li>
-                <li>Ingresá esta URL:</li>
-              </ol>
-              <div className="mt-2 bg-white border border-slate-200 rounded-lg px-3 py-2">
-                <p className="text-xs font-mono text-blue-600 break-all">{siteUrl}</p>
+          {isMobile ? (
+            <button
+              onClick={handleBeexo}
+              className="w-full flex items-center gap-5 p-5 bg-primary/10 hover:bg-primary/15 border border-primary/40 transition-all"
+            >
+              <div className="w-12 h-12 flex items-center justify-center bg-surface-container-low border border-outline-variant/20 shrink-0">
+                <svg viewBox="0 0 40 40" className="w-7 h-7" fill="none">
+                  <rect width="40" height="40" rx="8" fill="#F5C518"/>
+                  <path d="M20 8 L32 26 H8 Z" fill="#1A1A1A"/>
+                </svg>
               </div>
-            </div>
+              <div className="text-left flex-grow">
+                <div className="font-[family-name:var(--font-plus-jakarta)] font-bold uppercase tracking-wide text-on-surface text-sm">Beexo</div>
+                <div className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-xs mt-0.5">Wallet móvil nativa</div>
+              </div>
+              <span className="text-[10px] font-[family-name:var(--font-plus-jakarta)] font-bold uppercase tracking-widest text-primary border border-primary/40 px-2 py-1">
+                MEJOR OPCIÓN
+              </span>
+            </button>
+          ) : (
+            <button
+              onClick={handleMetaMask}
+              className="w-full flex items-center gap-5 p-5 bg-primary/10 hover:bg-primary/15 border border-primary/40 transition-all"
+            >
+              <div className="w-12 h-12 flex items-center justify-center bg-surface-container-low border border-outline-variant/20 shrink-0">
+                <svg viewBox="0 0 40 40" className="w-7 h-7" fill="none">
+                  <rect width="40" height="40" rx="8" fill="#F6851B"/>
+                  <path d="M32 8L22 15.5L24 11L32 8Z" fill="#fff"/>
+                  <path d="M8 8L17.8 15.5L16 11L8 8Z" fill="#fff"/>
+                  <path d="M20 24L14 21L20 32L26 21Z" fill="#fff"/>
+                </svg>
+              </div>
+              <div className="text-left flex-grow">
+                <div className="font-[family-name:var(--font-plus-jakarta)] font-bold uppercase tracking-wide text-on-surface text-sm">MetaMask</div>
+                <div className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-xs mt-0.5">Extensión de escritorio</div>
+              </div>
+              <span className="text-[10px] font-[family-name:var(--font-plus-jakarta)] font-bold uppercase tracking-widest text-primary border border-primary/40 px-2 py-1">
+                MEJOR OPCIÓN
+              </span>
+            </button>
           )}
+        </div>
 
-          {/* MetaMask */}
-          <button
-            onClick={handleMetaMask}
-            className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-slate-200 hover:border-orange-400 hover:bg-orange-50 transition-all text-left"
-          >
-            <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
-              <Monitor className="h-5 w-5 text-orange-600" />
-            </div>
-            <div>
-              <p className="font-semibold text-slate-900 text-sm">MetaMask</p>
-              <p className="text-xs text-slate-500">Extensión de escritorio</p>
-            </div>
-          </button>
+        {/* Separador con otras opciones */}
+        <div className="px-6 pb-3">
+          <div className="flex items-center gap-3 my-3">
+            <div className="flex-1 h-px bg-outline-variant/20" />
+            <span className="font-[family-name:var(--font-plus-jakarta)] text-[10px] uppercase tracking-widest text-on-surface-variant">o también</span>
+            <div className="flex-1 h-px bg-outline-variant/20" />
+          </div>
+
+          {isMobile ? (
+            <button
+              onClick={handleMetaMask}
+              className="w-full flex items-center gap-5 p-4 bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/20 hover:border-outline-variant transition-all"
+            >
+              <div className="w-10 h-10 flex items-center justify-center bg-surface-container-low border border-outline-variant/20 shrink-0">
+                <svg viewBox="0 0 40 40" className="w-6 h-6" fill="none">
+                  <rect width="40" height="40" rx="8" fill="#F6851B"/>
+                  <path d="M32 8L22 15.5L24 11L32 8Z" fill="#fff"/>
+                  <path d="M8 8L17.8 15.5L16 11L8 8Z" fill="#fff"/>
+                  <path d="M20 24L14 21L20 32L26 21Z" fill="#fff"/>
+                </svg>
+              </div>
+              <div className="text-left">
+                <div className="font-[family-name:var(--font-plus-jakarta)] font-bold uppercase tracking-wide text-on-surface text-xs">MetaMask</div>
+                <div className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-xs mt-0.5">Extensión de escritorio</div>
+              </div>
+            </button>
+          ) : (
+            <button
+              onClick={handleBeexo}
+              className="w-full flex items-center gap-5 p-4 bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/20 hover:border-outline-variant transition-all"
+            >
+              <div className="w-10 h-10 flex items-center justify-center bg-surface-container-low border border-outline-variant/20 shrink-0">
+                <svg viewBox="0 0 40 40" className="w-6 h-6" fill="none">
+                  <rect width="40" height="40" rx="8" fill="#F5C518"/>
+                  <path d="M20 8 L32 26 H8 Z" fill="#1A1A1A"/>
+                </svg>
+              </div>
+              <div className="text-left">
+                <div className="font-[family-name:var(--font-plus-jakarta)] font-bold uppercase tracking-wide text-on-surface text-xs">Beexo</div>
+                <div className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-xs mt-0.5">Wallet móvil</div>
+              </div>
+            </button>
+          )}
+        </div>
+
+        <div className="px-8 pb-6 text-center">
+          <p className="font-[family-name:var(--font-manrope)] text-on-surface-variant text-xs">
+            Al conectar aceptás los términos del protocolo.
+          </p>
         </div>
       </div>
     </div>

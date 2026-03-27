@@ -10,16 +10,16 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading, children, disabled, ...props }, ref) => {
     const variants = {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700 shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] border border-transparent',
-      secondary: 'bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 shadow-sm',
-      outline: 'bg-transparent text-blue-600 border border-blue-600 hover:bg-blue-50 shadow-sm',
-      ghost: 'bg-transparent text-slate-700 hover:bg-slate-100',
+      primary: 'bg-primary text-on-primary hover:bg-primary-fixed-dim border border-transparent shadow-[0px_24px_48px_rgba(0,0,0,0.4)]',
+      secondary: 'bg-surface-container-high text-on-surface border border-outline-variant/30 hover:bg-surface-container-highest',
+      outline: 'bg-transparent text-primary border border-outline-variant/30 hover:bg-surface-container-high',
+      ghost: 'bg-transparent text-on-surface-variant hover:bg-surface-container-high',
     };
 
     const sizes = {
-      sm: 'px-3 py-1.5 text-sm',
-      md: 'px-5 py-2.5 text-sm font-medium',
-      lg: 'px-6 py-3 text-base font-semibold',
+      sm: 'px-4 py-2 text-xs',
+      md: 'px-6 py-3 text-xs',
+      lg: 'px-10 py-5 text-sm',
     };
 
     return (
@@ -27,7 +27,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={cn(
-          'inline-flex items-center justify-center rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-70 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+          'inline-flex items-center justify-center font-[family-name:var(--font-plus-jakarta)] font-extrabold tracking-widest uppercase transition-all duration-200 active:scale-95 disabled:opacity-70 disabled:pointer-events-none focus:outline-none',
           variants[variant],
           sizes[size],
           className

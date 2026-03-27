@@ -9,7 +9,7 @@ import { useXO } from "@/context/XOProvider";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { ESCROW_ADDRESS, ESCROW_ABI } from "@/lib/escrow";
-import { ArrowLeft, Coins, ExternalLink, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 
 interface Application {
   id: number;
@@ -123,87 +123,165 @@ export default function CompanyProjectsPage() {
   }
 
   if (loading || dataLoading) {
-    return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><p className="text-slate-500">Cargando...</p></div>;
+    return (
+      <div className="min-h-screen bg-surface-container-low flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3">
-          <Link href="/company/dashboard" className="text-slate-400 hover:text-slate-600"><ArrowLeft className="h-5 w-5" /></Link>
-          <Coins className="h-5 w-5 text-orange-500" />
-          <span className="font-bold text-slate-900">Gestionar proyectos escrow</span>
-        </div>
-      </header>
+    <div className="min-h-screen bg-surface-container-low">
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        {projects.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-10 text-center">
-            <Coins className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-500">No tenés proyectos todavía. Creá uno desde Ofertas laborales.</p>
-          </div>
-        ) : projects.map((project) => (
-          <div key={project.id} className="bg-white rounded-2xl border border-slate-200 p-5">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h3 className="font-semibold text-slate-900">{project.title}</h3>
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                project.status === "completed" ? "bg-green-100 text-green-700" :
-                project.status === "active" ? "bg-blue-100 text-blue-700" : "bg-orange-100 text-orange-700"
-              }`}>{project.status}</span>
+      <main className="max-w-4xl mx-auto px-6 pt-24 pb-16 space-y-12">
+        <div className="flex items-center gap-4">
+          <Link href="/company/dashboard" className="w-12 h-12 rounded-full glass-premium flex items-center justify-center text-on-surface hover:scale-105 transition-transform shadow-ambient">
+            <span className="material-symbols-outlined">arrow_back</span>
+          </Link>
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-4xl text-[#f8a287]">currency_bitcoin</span>
+            <div>
+              <h1 className="text-3xl font-extrabold text-on-background font-[family-name:var(--font-plus-jakarta)] tracking-tight">
+                Gestión de Pagos
+              </h1>
+              <p className="text-secondary text-xs uppercase font-bold tracking-widest mt-1">Smart Contracts en RSK</p>
             </div>
-            <p className="text-sm font-medium text-orange-600">{project.amount_rbtc} tRBTC</p>
-            {project.tx_hash && (
-              <a href={`https://explorer.testnet.rsk.co/tx/${project.tx_hash}`} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1">
-                <ExternalLink className="h-3 w-3" />Ver TX en RSK Explorer
-              </a>
-            )}
+          </div>
+        </div>
 
-            {project.applications.length > 0 && (
-              <div className="mt-4">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Postulantes</p>
-                <div className="space-y-2">
-                  {project.applications.map((app) => (
-                    <div key={app.id} className="flex items-center justify-between bg-slate-50 rounded-xl px-4 py-3">
-                      <div>
-                        <p className="text-sm font-medium text-slate-800">{app.students?.name}</p>
-                        {app.match_score !== null && (
-                          <p className="text-xs text-violet-600">Match: {app.match_score}/100 · {app.match_reason}</p>
-                        )}
-                      </div>
-                      {project.status === "open" && app.status === "pending" && (
-                        <Button size="sm" onClick={() => handleAcceptApplicant(project, app)}>Aceptar</Button>
-                      )}
-                      {app.status === "accepted" && (
-                        <span className="text-xs text-green-600 font-medium flex items-center gap-1">
-                          <CheckCircle className="h-3.5 w-3.5" />Aceptado
-                        </span>
-                      )}
-                    </div>
-                  ))}
+        <section className="space-y-6">
+          {projects.length === 0 ? (
+            <div className="bg-surface-container-lowest rounded-[2.5rem] shadow-ambient p-12 text-center glass-card">
+              <div className="bg-surface-container-highest w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="material-symbols-outlined text-4xl text-secondary">assignment</span>
+              </div>
+              <h3 className="text-xl font-bold text-on-background mb-2">Aún no hay proyectos activos</h3>
+              <p className="text-secondary text-sm">Crea un proyecto desde tu bolsa de empleo para fondear tareas y liberar pagos automatizados contra entrega.</p>
+            </div>
+          ) : projects.map((project) => (
+            <div key={project.id} className="bg-surface-container-lowest rounded-[2.5rem] shadow-ambient p-8 relative overflow-hidden glass-card hover:border-outline-variant/30 border border-transparent transition-colors">
+
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-6 border-b border-outline-variant/10 pb-6 mb-6">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-2xl font-bold text-on-background">{project.title}</h3>
+                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                      project.status === "completed" ? "bg-[#e2f5e8] text-[#1c7841]" :
+                      project.status === "active" ? "bg-[#e1f0fe] text-[#2467ac]" :
+                      project.status === "delivered" ? "bg-[#fff3cd] text-[#856404]" : "bg-[#fdebe4] text-[#a44222]"
+                    }`}>
+                      {project.status === "open" && "ESPERANDO MATCH"}
+                      {project.status === "active" && "EN DESARROLLO"}
+                      {project.status === "delivered" && "ENTREGADO"}
+                      {project.status === "completed" && "FINALIZADO Y PAGADO"}
+                    </span>
+                  </div>
+                  <p className="text-secondary text-sm line-clamp-2 mt-2">{project.description}</p>
+                  {project.tx_hash && (
+                    <a href={`https://explorer.testnet.rsk.co/tx/${project.tx_hash}`} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold text-[#f8a287] hover:underline mt-4 bg-surface-container px-3 py-1.5 rounded-xl border border-[#f8a287]/20 transition-colors">
+                      <span className="material-symbols-outlined text-[12px]">link</span>
+                      Hash Lock <span className="opacity-50 ml-1">{project.tx_hash.substring(0,16)}...</span>
+                    </a>
+                  )}
+                </div>
+
+                <div className="flex flex-row sm:flex-col items-center sm:items-end gap-3 min-w-[120px]">
+                  <div className="text-left sm:text-right">
+                    <p className="text-[10px] uppercase font-black tracking-widest text-[#f8a287]">Fondo Bloqueado</p>
+                    <p className="text-2xl font-mono font-black text-on-background leading-none mt-1">
+                      {project.amount_rbtc} <span className="text-sm">tRBTC</span>
+                    </p>
+                  </div>
+                  <div className="text-left sm:text-right border-l sm:border-l-0 sm:border-t border-outline-variant/20 pl-4 sm:pl-0 sm:pt-4">
+                    <p className="text-[10px] uppercase font-bold tracking-widest text-secondary">Plazo Máximo</p>
+                    <p className="text-lg font-bold text-on-background">{project.deadline_days} días</p>
+                  </div>
                 </div>
               </div>
-            )}
 
-            {project.status === "delivered" && (
-              <div className="mt-4">
-                {releaseError[project.id] && (
-                  <p className="text-xs text-red-600 mb-2">{releaseError[project.id]}</p>
-                )}
-                <Button onClick={() => handleRelease(project)} isLoading={releasing === project.id}
-                  className="bg-green-600 hover:bg-green-700 gap-1.5">
-                  <CheckCircle className="h-4 w-4" />Aprobar y liberar pago
-                </Button>
-              </div>
-            )}
+              {/* Trazabilidad y Postulantes */}
+              {project.applications.length > 0 && (
+                <div className="bg-surface-container rounded-3xl p-6 border border-outline-variant/10">
+                  <p className="text-[10px] font-black tracking-widest uppercase text-secondary mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm">groups</span>
+                    Talento Postulado
+                  </p>
 
-            {project.status === "completed" && (
-              <p className="mt-4 text-sm text-green-600 font-medium flex items-center gap-1">
-                <CheckCircle className="h-4 w-4" />Pago liberado al estudiante
-              </p>
-            )}
-          </div>
-        ))}
+                  <div className="space-y-3">
+                    {project.applications.map((app) => (
+                      <div key={app.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-surface-container-lowest rounded-2xl px-5 py-4 shadow-sm border border-outline-variant/10 gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#E2C6F8] to-[#F8A081] text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                            {app.students?.name?.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-on-background">{app.students?.name}</p>
+                            {app.match_score !== null && (
+                              <p className="text-xs text-secondary mt-0.5">
+                                <span className="text-primary font-black">{app.match_score}% MATCH</span> · {app.match_reason}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {project.status === "open" && app.status === "pending" && (
+                          <button onClick={() => handleAcceptApplicant(project, app)} className="brand-gradient text-white rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-md active:scale-95 shrink-0">
+                            Aprobar Candidato
+                          </button>
+                        )}
+                        {app.status === "accepted" && (
+                          <div className="px-4 py-2 bg-[#e2f5e8]/50 border border-[#1c7841]/20 rounded-full flex items-center gap-2 shrink-0">
+                            <span className="material-symbols-outlined text-[#1c7841] text-sm">verified</span>
+                            <span className="text-[10px] text-[#1c7841] font-black tracking-widest uppercase">
+                              Asignado a este Talento
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Botón de Liberación (Smart Contract Interaction) */}
+              {(project.status === "active" || project.status === "delivered") && (
+                <div className="mt-8 pt-6 border-t border-outline-variant/10 text-center">
+                  <div className="inline-block">
+                    {releaseError[project.id] && (
+                      <p className="text-xs font-bold bg-error/10 text-error px-4 py-2 rounded-xl mb-4">{releaseError[project.id]}</p>
+                    )}
+                    <button onClick={() => handleRelease(project)} disabled={releasing === project.id}
+                      className="bg-on-background text-surface rounded-full px-8 py-4 text-xs font-black tracking-widest uppercase hover:scale-105 active:scale-95 transition-transform flex items-center gap-3 shadow-xl disabled:opacity-50">
+                      {releasing === project.id ? (
+                        <div className="w-5 h-5 border-2 border-surface border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <CheckCircle className="w-5 h-5" />
+                      )}
+                      Liberar Fondos (Aprobar Entrega)
+                    </button>
+                    <p className="text-[10px] font-bold text-secondary uppercase tracking-widest mt-4 opacity-70">
+                      Esta acción ejecuta el smart contract en RSK pagando al talento
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {project.status === "completed" && (
+                <div className="mt-6 pt-6 border-t border-outline-variant/10">
+                  <div className="bg-[#e2f5e8] border border-[#1c7841]/20 rounded-2xl p-4 flex items-center justify-center gap-3">
+                    <span className="material-symbols-outlined text-[#1c7841] text-2xl">verified</span>
+                    <p className="text-sm font-bold text-[#1c7841]">
+                      Contrato cerrado satisfactoriamente. El estudiante ha recibido sus tRBTC.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          ))}
+        </section>
+
       </main>
     </div>
   );
