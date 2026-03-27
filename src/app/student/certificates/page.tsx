@@ -66,7 +66,7 @@ function setCachedMint(certId: string, tokenId: string) {
 // Sonido mágico usando Web Audio API
 function playMintSound() {
   try {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
 
     const playNote = (freq: number, startTime: number) => {
       const osc = ctx.createOscillator();
