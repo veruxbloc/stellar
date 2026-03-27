@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore, useRef } from "reac
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useXO } from "@/context/XOProvider";
-import { Award, Upload, FileText, ExternalLink, AlertCircle, CheckCircle2, Wallet } from "lucide-react";
+import { Award, Upload, FileText, ExternalLink, AlertCircle, CheckCircle2, Wallet, Trash2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
@@ -58,6 +58,7 @@ export default function CertificatesPage() {
   const [certsLoading, setCertsLoading] = useState(true);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [successTxHash, setSuccessTxHash] = useState("");
@@ -101,6 +102,25 @@ export default function CertificatesPage() {
 
     fetchData();
   }, [user, supabase]);
+
+  async function handleDelete(cert: Certificate) {
+    if (!confirm("¿Seguro que querés eliminar este certificado?")) return;
+    setDeletingId(cert.id);
+
+    // Extraer path del storage desde la URL pública
+    try {
+      const url = new URL(cert.pdf_url);
+      const parts = url.pathname.split("/object/public/certificates/");
+      const storagePath = parts[1];
+      if (storagePath) {
+        await supabase.storage.from("certificates").remove([storagePath]);
+      }
+    } catch { /* si falla el borrado de storage igual borramos el registro */ }
+
+    await supabase.from("certificates").delete().eq("id", cert.id);
+    setCertificates((prev) => prev.filter((c) => c.id !== cert.id));
+    setDeletingId(null);
+  }
 
   async function handleMintNFT(certId: string) {
     const nftTokenId = `verus-nft-${certId}`;
@@ -418,6 +438,17 @@ export default function CertificatesPage() {
                         🏅 NFT verificado
                       </span>
                     )}
+                    {/* Delete button */}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(cert)}
+                      isLoading={deletingId === cert.id}
+                      className="text-red-400 hover:text-red-600 hover:bg-red-50 px-2"
+                      aria-label="Eliminar certificado"
+                    >
+                      {deletingId !== cert.id && <Trash2 className="h-4 w-4" />}
+                    </Button>
                   </div>
                 </div>
               ))}
