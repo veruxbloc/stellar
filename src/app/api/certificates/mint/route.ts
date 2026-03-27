@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createWalletClient, createPublicClient, http, parseAbi } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
-import { sepolia } from 'wagmi/chains'
+import { sepolia } from 'viem/chains'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: Request) {

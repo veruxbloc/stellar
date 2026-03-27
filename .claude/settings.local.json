@@ -7,7 +7,9 @@
       "Bash(npm run:*)",
       "Bash(wc -l /home/plkz/Escritorio/Hackaton/src/components/*.tsx /home/plkz/Escritorio/Hackaton/src/components/ui/*.tsx)",
       "WebSearch",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "WebFetch(domain:xo-connect.xolabs.io)",
+      "Bash(npx hardhat:*)"
     ]
   }
 }

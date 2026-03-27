@@ -25,6 +25,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "tailwind-merge": "^3.5.0",
+    "viem": "^2.47.6",
     "xo-connect": "^2.1.4"
   },
   "devDependencies": {
