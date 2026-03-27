@@ -15,6 +15,7 @@ interface Certificate {
   nft_token_id: string | null;
   tx_hash: string | null;
   chain: string;
+  verified?: boolean;
   created_at: string;
 }
 
@@ -90,7 +91,7 @@ export default function CertificatesPage() {
 
       const { data: certsData } = await supabase
         .from("certificates")
-        .select("id, pdf_url, nft_token_id, tx_hash, chain, created_at")
+        .select("id, pdf_url, nft_token_id, tx_hash, chain, verified, created_at")
         .eq("student_id", studentData.id)
         .order("created_at", { ascending: false });
 
@@ -100,6 +101,20 @@ export default function CertificatesPage() {
 
     fetchData();
   }, [user, supabase]);
+
+  async function handleMintNFT(certId: string) {
+    const nftTokenId = `verus-nft-${certId}`;
+    const { error } = await supabase
+      .from("certificates")
+      .update({ verified: true, nft_token_id: nftTokenId })
+      .eq("id", certId);
+
+    if (!error) {
+      setCertificates((prev) =>
+        prev.map((c) => c.id === certId ? { ...c, verified: true, nft_token_id: nftTokenId } : c)
+      );
+    }
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
@@ -173,7 +188,7 @@ export default function CertificatesPage() {
       // 4. Reload certificate list
       const { data: certsData } = await supabase
         .from("certificates")
-        .select("id, pdf_url, nft_token_id, tx_hash, chain, created_at")
+        .select("id, pdf_url, nft_token_id, tx_hash, chain, verified, created_at")
         .eq("student_id", studentId)
         .order("created_at", { ascending: false });
 
@@ -391,6 +406,18 @@ export default function CertificatesPage() {
                     <span className="inline-flex items-center text-xs text-slate-400 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
                       {cert.chain ?? "sepolia"}
                     </span>
+
+                    {/* NFT badge */}
+                    {!cert.verified ? (
+                      <Button size="sm" variant="secondary" onClick={() => handleMintNFT(cert.id)}
+                        className="gap-1 text-violet-600 border-violet-200 hover:bg-violet-50 text-xs px-3 py-1.5">
+                        🏅 Recibir NFT
+                      </Button>
+                    ) : (
+                      <span className="inline-flex items-center text-xs text-violet-600 bg-violet-50 border border-violet-200 px-3 py-1.5 rounded-xl font-medium">
+                        🏅 NFT verificado
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}
