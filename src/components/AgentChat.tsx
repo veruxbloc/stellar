@@ -9,15 +9,11 @@ interface Message {
   content: string;
 }
 
-interface AgentChatProps {
-  accountId: string | null;
-}
-
-export function AgentChat({ accountId }: AgentChatProps) {
+export function AgentChat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: `¡Hola! Soy tu asistente en Hedera. Puedo consultar tu balance de HBAR, tus tokens HTS y ejecutar transferencias. ¿En qué puedo ayudarte?`,
+      content: `¡Hola! Soy el asistente de Verus. Puedo consultarte proyectos disponibles, estadísticas de la plataforma y buscar estudiantes por especialidad. ¿En qué te ayudo?`,
     },
   ]);
   const [input, setInput] = useState("");
@@ -42,7 +38,6 @@ export function AgentChat({ accountId }: AgentChatProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [...messages, userMessage],
-          accountId,
         }),
       });
 
@@ -72,8 +67,8 @@ export function AgentChat({ accountId }: AgentChatProps) {
           <Bot className="h-5 w-5 text-white" />
         </div>
         <div>
-          <h3 className="text-white font-bold">Agente Hedera</h3>
-          <p className="text-slate-400 text-xs">Powered by Hedera Agent Kit</p>
+          <h3 className="text-white font-bold">Agente Verus</h3>
+          <p className="text-slate-400 text-xs">Powered by LangChain + OpenRouter</p>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -119,7 +114,7 @@ export function AgentChat({ accountId }: AgentChatProps) {
             <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-sm px-4 py-3">
               <div className="flex items-center gap-2 text-sm text-slate-500">
                 <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                Consultando en Hedera...
+                Consultando datos...
               </div>
             </div>
           </div>

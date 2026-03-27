@@ -6,6 +6,7 @@ import { MarketplaceProvider } from "@/context/MarketplaceContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { FloatingAgent } from "@/components/FloatingAgent";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default function RootLayout({
                   {children}
                 </main>
                 <Footer />
+                <FloatingAgent />
               </AuthProvider>
             </MarketplaceProvider>
         </XOProvider>

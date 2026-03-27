@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore, useRef } from "reac
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useXO } from "@/context/XOProvider";
-import { Award, Upload, FileText, ExternalLink, AlertCircle, CheckCircle2, Wallet } from "lucide-react";
+import { Award, Upload, FileText, ExternalLink, AlertCircle, CheckCircle2, Wallet, Trash2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
@@ -15,6 +15,7 @@ interface Certificate {
   nft_token_id: string | null;
   tx_hash: string | null;
   chain: string;
+  verified?: boolean;
   created_at: string;
 }
 
@@ -57,6 +58,7 @@ export default function CertificatesPage() {
   const [certsLoading, setCertsLoading] = useState(true);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [successTxHash, setSuccessTxHash] = useState("");
@@ -90,7 +92,7 @@ export default function CertificatesPage() {
 
       const { data: certsData } = await supabase
         .from("certificates")
-        .select("id, pdf_url, nft_token_id, tx_hash, chain, created_at")
+        .select("id, pdf_url, nft_token_id, tx_hash, chain, verified, created_at")
         .eq("student_id", studentData.id)
         .order("created_at", { ascending: false });
 
@@ -100,6 +102,39 @@ export default function CertificatesPage() {
 
     fetchData();
   }, [user, supabase]);
+
+  async function handleDelete(cert: Certificate) {
+    if (!confirm("¿Seguro que querés eliminar este certificado?")) return;
+    setDeletingId(cert.id);
+
+    // Extraer path del storage desde la URL pública
+    try {
+      const url = new URL(cert.pdf_url);
+      const parts = url.pathname.split("/object/public/certificates/");
+      const storagePath = parts[1];
+      if (storagePath) {
+        await supabase.storage.from("certificates").remove([storagePath]);
+      }
+    } catch { /* si falla el borrado de storage igual borramos el registro */ }
+
+    await supabase.from("certificates").delete().eq("id", cert.id);
+    setCertificates((prev) => prev.filter((c) => c.id !== cert.id));
+    setDeletingId(null);
+  }
+
+  async function handleMintNFT(certId: string) {
+    const nftTokenId = `verus-nft-${certId}`;
+    const { error } = await supabase
+      .from("certificates")
+      .update({ verified: true, nft_token_id: nftTokenId })
+      .eq("id", certId);
+
+    if (!error) {
+      setCertificates((prev) =>
+        prev.map((c) => c.id === certId ? { ...c, verified: true, nft_token_id: nftTokenId } : c)
+      );
+    }
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
@@ -173,7 +208,7 @@ export default function CertificatesPage() {
       // 4. Reload certificate list
       const { data: certsData } = await supabase
         .from("certificates")
-        .select("id, pdf_url, nft_token_id, tx_hash, chain, created_at")
+        .select("id, pdf_url, nft_token_id, tx_hash, chain, verified, created_at")
         .eq("student_id", studentId)
         .order("created_at", { ascending: false });
 
@@ -391,6 +426,29 @@ export default function CertificatesPage() {
                     <span className="inline-flex items-center text-xs text-slate-400 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
                       {cert.chain ?? "sepolia"}
                     </span>
+
+                    {/* NFT badge */}
+                    {!cert.verified ? (
+                      <Button size="sm" variant="secondary" onClick={() => handleMintNFT(cert.id)}
+                        className="gap-1 text-violet-600 border-violet-200 hover:bg-violet-50 text-xs px-3 py-1.5">
+                        🏅 Recibir NFT
+                      </Button>
+                    ) : (
+                      <span className="inline-flex items-center text-xs text-violet-600 bg-violet-50 border border-violet-200 px-3 py-1.5 rounded-xl font-medium">
+                        🏅 NFT verificado
+                      </span>
+                    )}
+                    {/* Delete button */}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(cert)}
+                      isLoading={deletingId === cert.id}
+                      className="text-red-400 hover:text-red-600 hover:bg-red-50 px-2"
+                      aria-label="Eliminar certificado"
+                    >
+                      {deletingId !== cert.id && <Trash2 className="h-4 w-4" />}
+                    </Button>
                   </div>
                 </div>
               ))}

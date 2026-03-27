@@ -1,0 +1,35 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_20-11169b4c0a4e56deff224e329553ca069e245e41",
+  "solcVersion": "0.8.20",
+  "solcLongVersion": "0.8.20+commit.a1b79de6",
+  "userSourceNameMap": {
+    "contracts/EscrowProject.sol": "project/contracts/EscrowProject.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "shanghai",
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/EscrowProject.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\ncontract EscrowProject {\n\n    enum Status { Open, Active, Delivered, Completed, Disputed, Refunded }\n\n    struct Project {\n        address payable company;\n        address payable student;\n        uint256 amount;\n        uint256 deadline;\n        Status  status;\n        string  title;\n        string  description;\n    }\n\n    address public arbiter;\n    uint256 public projectCount;\n    uint256 public platformFee;\n\n    mapping(uint256 => Project) public projects;\n\n    event ProjectCreated(uint256 indexed id, address company, uint256 amount, string title);\n    event StudentAssigned(uint256 indexed id, address student);\n    event WorkDelivered(uint256 indexed id);\n    event FundsReleased(uint256 indexed id, address student, uint256 amount);\n    event DisputeRaised(uint256 indexed id, address raisedBy);\n    event DisputeResolved(uint256 indexed id, bool favorStudent);\n    event ProjectRefunded(uint256 indexed id);\n\n    modifier onlyCompany(uint256 id)  { require(msg.sender == projects[id].company,  \"Solo la empresa\"); _; }\n    modifier onlyStudent(uint256 id)  { require(msg.sender == projects[id].student,  \"Solo el estudiante\"); _; }\n    modifier onlyArbiter()            { require(msg.sender == arbiter, \"Solo el arbitro\"); _; }\n    modifier inStatus(uint256 id, Status s) { require(projects[id].status == s, \"Estado incorrecto\"); _; }\n\n    constructor(uint256 _feeBps) {\n        arbiter     = msg.sender;\n        platformFee = _feeBps;\n    }\n\n    function createProject(\n        address payable _student,\n        uint256 _deadline,\n        string calldata _title,\n        string calldata _description\n    ) external payable returns (uint256) {\n        require(msg.value > 0, \"Debe fondear el proyecto\");\n        require(_deadline > block.timestamp, \"Deadline debe ser futuro\");\n\n        uint256 id = projectCount++;\n        projects[id] = Project({\n            company:     payable(msg.sender),\n            student:     _student,\n            amount:      msg.value,\n            deadline:    _deadline,\n            status:      _student != address(0) ? Status.Active : Status.Open,\n            title:       _title,\n            description: _description\n        });\n\n        emit ProjectCreated(id, msg.sender, msg.value, _title);\n        if (_student != address(0)) emit StudentAssigned(id, _student);\n        return id;\n    }\n\n    function assignStudent(uint256 id, address payable _student)\n        external onlyCompany(id) inStatus(id, Status.Open)\n    {\n        projects[id].student = _student;\n        projects[id].status  = Status.Active;\n        emit StudentAssigned(id, _student);\n    }\n\n    function deliverWork(uint256 id)\n        external onlyStudent(id) inStatus(id, Status.Active)\n    {\n        projects[id].status = Status.Delivered;\n        emit WorkDelivered(id);\n    }\n\n    function approveAndRelease(uint256 id)\n        external onlyCompany(id) inStatus(id, Status.Delivered)\n    {\n        Project storage p = projects[id];\n        p.status = Status.Completed;\n\n        uint256 fee    = (p.amount * platformFee) / 10000;\n        uint256 payout = p.amount - fee;\n\n        p.student.transfer(payout);\n        if (fee > 0) payable(arbiter).transfer(fee);\n\n        emit FundsReleased(id, p.student, payout);\n    }\n\n    function raiseDispute(uint256 id) external {\n        Project storage p = projects[id];\n        require(msg.sender == p.company || msg.sender == p.student, \"Solo participantes\");\n        require(p.status == Status.Active || p.status == Status.Delivered, \"Estado no disputable\");\n        p.status = Status.Disputed;\n        emit DisputeRaised(id, msg.sender);\n    }\n\n    function resolveDispute(uint256 id, bool favorStudent)\n        external onlyArbiter inStatus(id, Status.Disputed)\n    {\n        Project storage p = projects[id];\n        p.status = Status.Completed;\n        if (favorStudent) { p.student.transfer(p.amount); }\n        else              { p.company.transfer(p.amount); }\n        emit DisputeResolved(id, favorStudent);\n    }\n\n    function claimRefund(uint256 id)\n        external onlyCompany(id) inStatus(id, Status.Active)\n    {\n        Project storage p = projects[id];\n        require(block.timestamp > p.deadline, \"Deadline no vencido\");\n        p.status = Status.Refunded;\n        p.company.transfer(p.amount);\n        emit ProjectRefunded(id);\n    }\n\n    function getProject(uint256 id) external view returns (Project memory) {\n        return projects[id];\n    }\n}\n"
+      }
+    }
+  }
+}

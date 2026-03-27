@@ -3,10 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ethers } from "ethers";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
-import { ArrowLeft, Briefcase, Plus, Trash2, X } from "lucide-react";
+import { ESCROW_ADDRESS, ESCROW_ABI, RSK_TESTNET_CHAIN_ID } from "@/lib/escrow";
+import { ArrowLeft, Briefcase, Plus, Trash2, X, Coins, ExternalLink } from "lucide-react";
 
 interface JobPost {
   id: string;
@@ -46,6 +48,28 @@ export default function CompanyJobsPage() {
   // Delete state
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Escrow project state
+  interface EscrowProject {
+    id: number;
+    title: string;
+    description: string;
+    amount_rbtc: number;
+    deadline_days: number;
+    tx_hash: string | null;
+    contract_project_id: number | null;
+    status: string;
+    created_at: string;
+  }
+
+  const [escrowProjects, setEscrowProjects] = useState<EscrowProject[]>([]);
+  const [showEscrowForm, setShowEscrowForm] = useState(false);
+  const [escrowTitle, setEscrowTitle] = useState("");
+  const [escrowDescription, setEscrowDescription] = useState("");
+  const [escrowAmount, setEscrowAmount] = useState("0.0001");
+  const [escrowDays, setEscrowDays] = useState("30");
+  const [escrowSubmitting, setEscrowSubmitting] = useState(false);
+  const [escrowError, setEscrowError] = useState("");
+
   useEffect(() => {
     if (!loading && !user) {
       router.push("/auth/login");
@@ -78,6 +102,14 @@ export default function CompanyJobsPage() {
         .order("created_at", { ascending: false });
 
       setJobs((jobsData as JobPost[]) ?? []);
+
+      const { data: projectsData } = await supabase
+        .from("projects")
+        .select("id, title, description, amount_rbtc, deadline_days, tx_hash, contract_project_id, status, created_at")
+        .eq("company_id", companyData.id)
+        .order("created_at", { ascending: false });
+
+      setEscrowProjects((projectsData as EscrowProject[]) ?? []);
       setDataLoading(false);
     }
 
@@ -129,6 +161,95 @@ export default function CompanyJobsPage() {
     }
 
     setDeletingId(null);
+  }
+
+  async function handleCreateEscrow(e: React.FormEvent) {
+    e.preventDefault();
+    if (!companyId) return;
+    setEscrowSubmitting(true);
+    setEscrowError("");
+
+    try {
+      const win = window as unknown as { ethereum?: { request: (a: { method: string; params?: unknown[] }) => Promise<unknown> } };
+      if (!win.ethereum) throw new Error("Instalá MetaMask o usá Beexo desde el celular.");
+
+      const chainId = await win.ethereum.request({ method: "eth_chainId" }) as string;
+      if (chainId !== RSK_TESTNET_CHAIN_ID) {
+        await win.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: RSK_TESTNET_CHAIN_ID }],
+        }).catch(async () => {
+          await win.ethereum!.request({
+            method: "wallet_addEthereumChain",
+            params: [{
+              chainId: RSK_TESTNET_CHAIN_ID,
+              chainName: "RSK Testnet",
+              nativeCurrency: { name: "tRBTC", symbol: "tRBTC", decimals: 18 },
+              rpcUrls: ["https://public-node.testnet.rsk.co"],
+              blockExplorerUrls: ["https://explorer.testnet.rsk.co"],
+            }],
+          });
+        });
+      }
+
+      const provider = new ethers.BrowserProvider(win.ethereum as ethers.Eip1193Provider);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, signer);
+
+      const deadlineTimestamp = Math.floor(Date.now() / 1000) + parseInt(escrowDays) * 86400;
+      const amountWei = ethers.parseEther(escrowAmount);
+
+      const tx = await contract.createProject(
+        ethers.ZeroAddress,
+        deadlineTimestamp,
+        escrowTitle.trim(),
+        escrowDescription.trim(),
+        { value: amountWei }
+      );
+
+      const receipt = await tx.wait();
+
+      const iface = new ethers.Interface(ESCROW_ABI);
+      let contractProjectId: number | null = null;
+      for (const log of receipt.logs) {
+        try {
+          const parsed = iface.parseLog(log);
+          if (parsed?.name === "ProjectCreated") {
+            contractProjectId = Number(parsed.args[0]);
+            break;
+          }
+        } catch { /* skip */ }
+      }
+
+      const { data, error } = await supabase
+        .from("projects")
+        .insert({
+          company_id: companyId,
+          title: escrowTitle.trim(),
+          description: escrowDescription.trim(),
+          amount_rbtc: parseFloat(escrowAmount),
+          deadline_days: parseInt(escrowDays),
+          tx_hash: receipt.hash,
+          contract_project_id: contractProjectId,
+          status: "open",
+        })
+        .select()
+        .single();
+
+      if (error || !data) throw new Error("Error guardando en base de datos.");
+
+      setEscrowProjects((prev) => [data as EscrowProject, ...prev]);
+      setEscrowTitle("");
+      setEscrowDescription("");
+      setEscrowAmount("0.0001");
+      setEscrowDays("30");
+      setShowEscrowForm(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error desconocido";
+      setEscrowError(msg.includes("user rejected") ? "Transacción rechazada." : msg);
+    } finally {
+      setEscrowSubmitting(false);
+    }
   }
 
   function formatDate(dateStr: string) {
@@ -307,6 +428,82 @@ export default function CompanyJobsPage() {
                       {deletingId !== job.id && <Trash2 className="h-4 w-4" />}
                     </Button>
                   </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Escrow Projects Section */}
+        <div className="mt-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <Coins className="h-5 w-5 text-orange-500" />
+              Proyectos con Escrow RSK
+            </h2>
+            <Button size="sm" onClick={() => setShowEscrowForm((v) => !v)} className="gap-1.5 bg-orange-500 hover:bg-orange-600">
+              {showEscrowForm ? <><X className="h-4 w-4" />Cancelar</> : <><Plus className="h-4 w-4" />Nuevo proyecto</>}
+            </Button>
+          </div>
+
+          {showEscrowForm && (
+            <div className="bg-white rounded-2xl border border-orange-200 shadow-sm p-6 mb-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-1">Crear proyecto con escrow</h3>
+              <p className="text-sm text-slate-500 mb-5">El monto quedará bloqueado en RSK hasta que apruebes la entrega.</p>
+              <form onSubmit={handleCreateEscrow} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Título <span className="text-red-500">*</span></label>
+                  <input type="text" required value={escrowTitle} onChange={(e) => setEscrowTitle(e.target.value)}
+                    placeholder="Ej: App móvil de delivery"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Descripción <span className="text-red-500">*</span></label>
+                  <textarea required value={escrowDescription} onChange={(e) => setEscrowDescription(e.target.value)}
+                    rows={3} placeholder="Describí el proyecto y los requisitos..."
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Monto (tRBTC) <span className="text-red-500">*</span></label>
+                    <input type="number" step="0.0001" min="0.0001" required value={escrowAmount} onChange={(e) => setEscrowAmount(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Deadline (días) <span className="text-red-500">*</span></label>
+                    <input type="number" min="1" required value={escrowDays} onChange={(e) => setEscrowDays(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                  </div>
+                </div>
+                {escrowError && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-xl">{escrowError}</p>}
+                <Button type="submit" isLoading={escrowSubmitting} className="bg-orange-500 hover:bg-orange-600">
+                  Fondear proyecto en RSK
+                </Button>
+              </form>
+            </div>
+          )}
+
+          {escrowProjects.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
+              <Coins className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-500">Todavía no creaste proyectos con escrow.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {escrowProjects.map((p) => (
+                <div key={p.id} className="bg-white rounded-2xl border border-slate-200 p-5">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h3 className="font-semibold text-slate-900">{p.title}</h3>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">{p.status}</span>
+                  </div>
+                  <p className="text-slate-500 text-sm line-clamp-2">{p.description}</p>
+                  <p className="text-sm font-medium text-orange-600 mt-2">{p.amount_rbtc} tRBTC · {p.deadline_days} días</p>
+                  {p.tx_hash && (
+                    <a href={`https://explorer.testnet.rsk.co/tx/${p.tx_hash}`} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1">
+                      <ExternalLink className="h-3 w-3" />Ver en RSK Explorer
+                    </a>
+                  )}
                 </div>
               ))}
             </div>

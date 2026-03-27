@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useXO } from "@/context/XOProvider";
-import { GraduationCap, BookOpen, Award, ChevronRight, Wallet } from "lucide-react";
+import { GraduationCap, BookOpen, Award, ChevronRight, Wallet, Coins, Bot } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
@@ -260,6 +260,22 @@ export default function StudentDashboardPage() {
             </Button>
           </Link>
         </div>
+
+
+        {/* Projects escrow link */}
+        <Link
+          href="/student/projects"
+          className="mt-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white flex items-center justify-between"
+        >
+          <div>
+            <h3 className="text-lg font-semibold">Proyectos disponibles</h3>
+            <p className="text-orange-100 text-sm mt-0.5">Encontrá proyectos con escrow en RSK</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Coins className="h-6 w-6 text-white/80" />
+            <ChevronRight className="h-5 w-5 text-white/80" />
+          </div>
+        </Link>
 
       </div>
     </div>

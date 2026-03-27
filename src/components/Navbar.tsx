@@ -1,6 +1,5 @@
 "use client";
 
-const HEDERA_ENABLED = false;
 
 import { useSyncExternalStore } from "react";
 import Link from "next/link";

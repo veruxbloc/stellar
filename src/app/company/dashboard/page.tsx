@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
-import { Building2, Briefcase, GraduationCap, ChevronRight, LogOut } from "lucide-react";
+import { Building2, Briefcase, GraduationCap, ChevronRight, LogOut, Coins } from "lucide-react";
 
 interface Company {
   id: string;
@@ -178,6 +178,24 @@ export default function CompanyDashboardPage() {
                 </div>
               </div>
               <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
+            </div>
+          </Link>
+
+          <Link
+            href="/company/projects"
+            className="bg-white rounded-2xl border border-slate-200 p-6 hover:border-orange-300 hover:shadow-md transition-all group"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-orange-100 rounded-xl p-2.5">
+                  <Coins className="h-5 w-5 text-orange-500" />
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">Proyectos escrow</p>
+                  <p className="text-sm text-slate-500 mt-0.5">Gestioná pagos en RSK</p>
+                </div>
+              </div>
+              <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-orange-500 transition-colors" />
             </div>
           </Link>
 

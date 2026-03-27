@@ -7,7 +7,10 @@
       "Bash(npm run:*)",
       "Bash(wc -l /home/plkz/Escritorio/Hackaton/src/components/*.tsx /home/plkz/Escritorio/Hackaton/src/components/ui/*.tsx)",
       "WebSearch",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "WebFetch(domain:xo-connect.xolabs.io)",
+      "Bash(npx hardhat:*)",
+      "Bash(curl -s -X POST http://localhost:3000/api/agent -H \"Content-Type: application/json\" -d '{\"\"\"\"messages\"\"\"\":[{\"\"\"\"role\"\"\"\":\"\"\"\"user\"\"\"\",\"\"\"\"content\"\"\"\":\"\"\"\"hola\"\"\"\"}]}')"
     ]
   }
 }

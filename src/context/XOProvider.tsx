@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { XOConnectProvider } from "xo-connect";
 
-const provider = new XOConnectProvider({ debug: true });
+const provider = new XOConnectProvider({ debug: false });
 
 interface XOContextType {
   address: string | null;
