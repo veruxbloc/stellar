@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useXO } from "@/context/XOProvider";
-import { GraduationCap, BookOpen, Award, ChevronRight, Wallet, Coins } from "lucide-react";
+import { GraduationCap, BookOpen, Award, ChevronRight, Wallet, Coins, Bot } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
@@ -260,6 +260,23 @@ export default function StudentDashboardPage() {
             </Button>
           </Link>
         </div>
+
+        {/* Agent link */}
+        <Link
+          href="/agent"
+          className="mt-4 bg-white rounded-2xl border border-slate-200 p-6 hover:border-blue-300 hover:shadow-md transition-all group flex items-center justify-between"
+        >
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-100 rounded-xl p-2.5">
+              <Bot className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="font-semibold text-slate-900">Agente IA</p>
+              <p className="text-sm text-slate-500 mt-0.5">Consultá proyectos y estudiantes</p>
+            </div>
+          </div>
+          <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
+        </Link>
 
         {/* Projects escrow link */}
         <Link
